@@ -12,13 +12,6 @@
 # $ git status
 # to call both git_prompt_branch and git_prompt_status
 
-# Checks if there are commits ahead from remote
-function git_prompt_ahead() {
-  if $(echo "$(git log origin/$(current_branch)..HEAD 2> /dev/null)" | grep '^commit' &> /dev/null); then
-    echo "$ZSH_THEME_GIT_PROMPT_AHEAD"
-  fi
-}
-
 # Function : git_prompt_prefix
 # Arguments: (optional) absolute path to the repo root with
 #            $ git rev-parse --show-toplevel
@@ -26,9 +19,11 @@ function git_prompt_ahead() {
 #            root (non-inclusive)
 function git_prompt_prefix
 {
-   if [[ $# -eq 1 ]]
-   then
-      echo ${$(pwd)#$1}
+
+   [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|prefix\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && return
+
+   if [[ $# -eq 1 ]]; then
+      echo ${$(pwd)#$1} # 60% faster!
    else
       echo $(git rev-parse --show-prefix 2> /dev/null)
    fi
@@ -40,11 +35,14 @@ function git_prompt_prefix
 # Purpose  : Get the name of the checked out branch
 function git_prompt_branch
 {
+   [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|branch\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && return
+
    if [[ $# -eq 1 ]]; then
       echo $1 | sed -n -e 's/# On branch //p'
    else
       refs=$(git symbolic-ref HEAD 2> /dev/null) || return
       echo ${refs#refs/heads/}
+      unset refs
    fi
 }
    
@@ -55,29 +53,27 @@ function git_prompt_branch
 function git_prompt_status
 {
 
+   [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|status\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && echo -n $ZSH_THEME_REPO_UNKNOWN && return
+
    if [[ $# -eq 1 ]]; then
-      gitstat=$1
+      gitstat=$1 # 40% faster
    else
-      gitstat=$(git status 2> /dev/null | grep '# \(Untracked\|Changes\)' )
+      gitstat=$(git status 2> /dev/null | grep '# \(Untracked\|Change\)') || return
    fi
 
    stat_string=''
 
-   if [[ -n $ZSH_THEME_REPO_DIRTY && $(echo ${gitstat} | grep -c "^# Changes to be committed:$" ) > 0 ]]; then
-      stat_string=$stat_string$ZSH_THEME_REPO_DIRTY
-   fi
+   [[ -n $ZSH_THEME_REPO_DIRTY && $(echo ${gitstat} | grep -c "^# Changes to be committed:$" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_DIRTY
 
-   if [[ -n $ZSH_THEME_REPO_UNTRACKED && $(echo ${gitstat} | grep -c "^# \(Untracked files\|Changed but not updated\|Changes not staged for commit\):$" ) > 0 ]]; then
-      stat_string=$stat_string$ZSH_THEME_REPO_UNTRACKED
-   fi
+   [[ -n $ZSH_THEME_REPO_UNTRACKED && $(echo ${gitstat} | grep -c "^# \(Untracked files\|Changed but not updated\|Changes not staged for commit\):$" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_UNTRACKED
 
-   if [[ -n $ZSH_THEME_REPO_CLEAN && ( $(echo ${gitstat} | grep -v '^$' | wc -l | tr -d ' ') == 0 ) ]]; then
-      stat_string=$stat_string$ZSH_THEME_REPO_CLEAN
-   fi
+   [[ -n $ZSH_THEME_REPO_CLEAN && ( $(echo ${gitstat} | grep -v '^$' | wc -l | tr -d ' ') == 0 ) ]] && stat_string+=$ZSH_THEME_REPO_CLEAN
 
    if [[ -n $stat_string ]]; then
       echo -n "$stat_string"
    else
       echo -n "$ZSH_THEME_REPO_CLEAN"
    fi
+
+   unset gitstat
 }

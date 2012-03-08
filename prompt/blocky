@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 # Patrick Conley <pconley@uvic.ca>
-# Last modified: 2012 Mar 07
+# Last modified: 2012 Mar 08
 #
 # Summary: A prompt that looks something like this:
 #
@@ -19,7 +19,10 @@ ZSH_THEME_REPO_PREFIX_COLOR="%{$fg[green]%}"
 ZSH_THEME_REPO_BRANCH_COLOR="%{$fg[magenta]%}"
 ZSH_THEME_REPO_DIRTY="%{$fg[green]%}!"
 ZSH_THEME_REPO_UNTRACKED="%{$fg[green]%}?"
+ZSH_THEME_REPO_UNKNOWN="%{$fg[red]%}??"
 ZSH_THEME_REPO_CLEAN=""
+
+ZSH_PROMPT_IGNORE=".zsh_prompt_ignore"
 
 function zsh-prompt-read-error # {{{1
 {
@@ -72,39 +75,36 @@ function zsh-prompt-padding # {{{1
 function zsh-prompt-pwd # {{{1
 {
 
-   git_root=$( git rev-parse --show-toplevel 2> /dev/null )
-   if [[ -n $git_root ]]; then
-      gitstat=$(git status 2> /dev/null | grep '# \(Untracked\|Changes\|On branch\)' )
+   if [[ $( cat $ZSH_PROMPT_IGNORE 2> /dev/null | grep -c "all" ) -eq 0 ]]; then
 
-      git_prompt=(
-         "∓ "
-         "$ZSH_THEME_REPO_NAME_COLOR"
-         "${git_root##*/}"
-         "$ZSH_THEME_REPO_PREFIX_COLOR"
-         "$(git_prompt_prefix $git_root)"
-         "$ZSH_THEME_REPO_BRANCH_COLOR"
-         " $(git_prompt_branch $gitstat)"
- #          " $( echo $gitstat | sed -n -e '/On branch/s/.*On branch //p' )"
-         "$(git_prompt_status $gitstat)"
-         "%{$reset_color%}"
-      )
+      git_root=$( git rev-parse --show-toplevel 2> /dev/null )
+      if [[ -n $git_root ]]; then
 
-      echo -n ${(j::)git_prompt} && return
-   fi
+         git_prompt=(
+            "∓ "
+            "$ZSH_THEME_REPO_NAME_COLOR" "${git_root##*/}"
+            "$ZSH_THEME_REPO_PREFIX_COLOR" "$(git_prompt_prefix $git_root)"
+            "%{$reset_color%} on " "$ZSH_THEME_REPO_BRANCH_COLOR" "$(git_prompt_branch)"
+            "$(git_prompt_status)"
+            "%{$reset_color%}"
+         )
 
-   svn_name=$(svn info 2> /dev/null | sed -n 's/Repository Root: .*\///p')
-   if [[ -n $svn_root ]]; then
-      svn_prompt=(
-         "𝓢 "
-         "$ZSH_THEME_REPO_NAME_COLOR"
-         "$svn_name"
-         "$ZSH_THEME_REPO_PREFIX_COLOR"
-         "$(svn_prompt_prefix $svn_root)"
-         "$(svn_prompt_status)"
-         "%{$reset_color%}"
-      )
+         echo -n ${(j::)git_prompt} && return
+      fi
 
-      echo -n ${(j::)svn_prompt} && return
+      svn_name=$(svn info 2> /dev/null | sed -n 's/Repository Root: .*\///p')
+      if [[ -n $svn_name ]]; then
+         svn_prompt=(
+            "𝓢 "
+            "$ZSH_THEME_REPO_NAME_COLOR" "$svn_name"
+            "$ZSH_THEME_REPO_PREFIX_COLOR" "$(svn_prompt_prefix $svn_name)"
+            "$(svn_prompt_status)"
+            "%{$reset_color%}"
+         )
+
+         echo -n ${(j::)svn_prompt} && return
+      fi
+
    fi
 
    echo -n "  %{$fg[green]%}%~%{$reset_color%}" && return

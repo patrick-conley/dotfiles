@@ -16,13 +16,11 @@
 function svn_prompt_prefix
 {
 
-   if [[ $# -eq 1 ]]
-   then
-      echo -n ${$(pwd)#*/$1*}
-   else
-      svn_root=$(svn info 2> /dev/null | sed -n -e 's/^Repository Root: *\///p' ) || return
-      echo -n ${$(pwd)#*/$svn_root*}
-   fi
+   [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|prefix\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && return
+
+   [[ $# -eq 0 ]] && ( 1=$(svn info 2> /dev/null | sed -n -e 's/^Repository Root: .*\///p' ) || return )
+
+   echo -n ${$(pwd)#*/$1*}
 }
 
 # Function : svn_prompt_status
@@ -30,22 +28,22 @@ function svn_prompt_prefix
 # Purpose  : Check whether the repo has uncommitted changes
 function svn_prompt_status
 {
+   [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|status\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && echo -n $ZSH_THEME_REPO_UNKNOWN && return
+
    svnstat=$(svn status 2>/dev/null) || return
 
    stat_string=''
 
-   if [[ $( echo $svnstat | grep -c '^\s*[ACDM!]' ) > 0 ]]; then
-      stat_string=$stat_string$ZSH_THEME_REPO_DIRTY
-   fi
+   [[ -n $ZSH_THEME_REPO_DIRTY && $( echo $svnstat | grep -c '^\s*[ACDM!]' ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_DIRTY
 
-   if [[ $( echo $svnstat | grep -c '^\s*?' ) > 0 ]]; then
-      stat_string=$stat_string$ZSH_THEME_REPO_UNTRACKED
-   fi
+   [[ -n $ZSH_THEME_REPO_UNTRACKED && $( echo $svnstat | grep -c '^\s*?' ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_UNTRACKED
 
    if [[ -n $stat_string ]]; then
       echo -n "$stat_string"
    else
       echo -n "$ZSH_THEME_REPO_CLEAN"
    fi
+
+   unset svnstat
 
 }
