@@ -1,0 +1,173 @@
+#!/usr/bin/zsh
+
+# Patrick Conley <pconley@uvic.ca>
+# Last modified: 2012 Mar 07
+#
+# Summary: A prompt that looks something like this:
+#
+# ⎡ Bellgrove in 2  ⎤   ~/
+# ⎣ 13 Feb at 12:14 ⎦ ≻                                                 4 :error
+#
+# (including git/svn information in the path)
+# 
+
+source ~/.zsh/plugin/git.zsh
+source ~/.zsh/plugin/svn.zsh
+
+ZSH_THEME_REPO_NAME_COLOR="%{$fg[yellow]%}"
+ZSH_THEME_REPO_PREFIX_COLOR="%{$fg[green]%}"
+ZSH_THEME_REPO_BRANCH_COLOR="%{$fg[magenta]%}"
+ZSH_THEME_REPO_DIRTY="%{$fg[green]%}!"
+ZSH_THEME_REPO_UNTRACKED="%{$fg[green]%}?"
+ZSH_THEME_REPO_CLEAN=""
+
+function zsh-prompt-read-error # {{{1
+{
+
+   unset error
+
+   error_file=/tmp/pconley-script-error
+   if [ ! -f $error_file ]
+   then
+      exit
+   fi
+   
+   error=$( cat $error_file )
+   rm $error_file
+
+   print "%{$fg[red]%}error: %{$reset_color%}%{$bg[red]%} $error %{$reset_color%}"
+
+}
+
+function zsh-prompt-padding # {{{1
+{
+
+   hoststring=$( uname -n )     # hostname
+   hoststring=${hoststring%%.local} # remove all suffixes
+
+   # set the number of characters needed to display the shell depth
+   shlvl_length=0
+   if [[ $SHLVL -gt 1 ]]
+   then
+      (( shlvl_length = ${#SHLVL} + 4 ))
+   fi
+
+   # the minimum length of each line
+   (( ps1_upper_length = ${#hoststring} + $shlvl_length ))
+   ps1_lower_length=15
+
+   # set which line we're padding
+   if [[ $1 == 'up' ]]
+   then
+      (( padding = ps1_lower_length - ps1_upper_length ))
+   elif [[ $1 == 'low' ]]
+   then
+      (( padding = ps1_upper_length - ps1_lower_length ))
+   fi
+
+
+   repeat $padding printf ' '
+} 
+
+function zsh-prompt-pwd # {{{1
+{
+
+   git_root=$( git rev-parse --show-toplevel 2> /dev/null )
+   if [[ -n $git_root ]]; then
+      gitstat=$(git status 2> /dev/null | grep '# \(Untracked\|Changes\|On branch\)' )
+
+      git_prompt=(
+         "∓ "
+         "$ZSH_THEME_REPO_NAME_COLOR"
+         "${git_root##*/}"
+         "$ZSH_THEME_REPO_PREFIX_COLOR"
+         "$(git_prompt_prefix $git_root)"
+         "$ZSH_THEME_REPO_BRANCH_COLOR"
+         " $(git_prompt_branch $gitstat)"
+ #          " $( echo $gitstat | sed -n -e '/On branch/s/.*On branch //p' )"
+         "$(git_prompt_status $gitstat)"
+         "%{$reset_color%}"
+      )
+
+      echo -n ${(j::)git_prompt} && return
+   fi
+
+   svn_name=$(svn info 2> /dev/null | sed -n 's/Repository Root: .*\///p')
+   if [[ -n $svn_root ]]; then
+      svn_prompt=(
+         "𝓢 "
+         "$ZSH_THEME_REPO_NAME_COLOR"
+         "$svn_name"
+         "$ZSH_THEME_REPO_PREFIX_COLOR"
+         "$(svn_prompt_prefix $svn_root)"
+         "$(svn_prompt_status)"
+         "%{$reset_color%}"
+      )
+
+      echo -n ${(j::)svn_prompt} && return
+   fi
+
+   echo -n "  %{$fg[green]%}%~%{$reset_color%}" && return
+
+}
+
+# }}}1
+
+ps1_upper_head=(
+   "%{$fg[cyan]%}⎡%{$reset_color%} "
+)
+
+ps1_upper_body=( 
+   "%{$fg_bold[red]%}"
+   "%m"                                                # hostname
+   "%{$reset_color%}"
+
+   "%(2L.%B in %b%{$fg[yellow]%}%L%{$reset_color%}.)" # shell depth
+
+)
+
+ps1_upper_tail=(
+   " %{$fg[cyan]%}⎤%{$reset_color%} "
+   # add the path here in $PS1 (from function eval)
+)
+
+ps1_lower_head=(
+   "%{$fg[cyan]%}⎣%{$reset_color%} "
+)
+
+ps1_lower_body=(
+   "%{$fg_bold[yellow]%}"
+   "%D{%d %b at %H:%M}"                        # date & time
+   "%{$reset_color%}"
+)
+
+ps1_lower_tail=(
+   " %{$fg[cyan]%}⎦%{$reset_color%}"
+   " %{%(!.$fg_bold[red].$fg_bold[cyan])%}"
+   "≻ "                                    # prompt char
+   "%{$reset_color%}"
+)
+
+PS1='
+${(j::)ps1_upper_head}${(j::)ps1_upper_body}$(zsh-prompt-padding up)${(j::)ps1_upper_tail}$(zsh-prompt-pwd)
+${(j::)ps1_lower_head}$(zsh-prompt-padding low)${(j::)ps1_lower_body}${(j::)ps1_lower_tail}'
+
+ps2=( 
+   "%{$fg_bold[cyan]%}"
+   "%_ "
+   "%{$fg_bold[red]%}"
+   "> "
+   "%{$reset_color%}"
+)
+PS2=${(j::)ps2}
+
+errorstring=(
+   "%{$fg[red]%}"
+   "error: "
+   "%{$reset_color%}"
+   "%{$bg[red]%}"
+   " %? "
+   "%{$reset_color%}"
+)
+
+RPROMPT='%(?.$(zsh-prompt-read-error).${(j::)errorstring})'
