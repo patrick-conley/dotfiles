@@ -26,7 +26,7 @@ function zsh-prompt-read-error # {{{1
 
    unset error
 
-   error_file=/tmp/pconley-script-error
+   error_file=/tmp/$(whoami)-script-error
    if [ ! -f $error_file ]
    then
       exit
