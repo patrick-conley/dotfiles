@@ -9,6 +9,16 @@
 # to check if we are in an svn repo, get the repository name, and call
 # svn_prompt_prefix
 
+# Function : svn_prompt_root
+# Arguments: N/A
+# Purpose  : Return the path to the current svn repo
+function svn_prompt_root
+{
+   svn_info=$( svn info 2> /dev/null ) || return
+   svn_repo_name=$( echo $svn_info | sed -n -e 's!^Repository Root: .*/!!p' ) || return
+   echo ${$(pwd)%%$svn_repo_name*}$svn_repo_name
+}
+
 # Function : svn_prompt_prefix
 # Arguments: (optional) name of the svn repo (may save time)
 # Purpose  : Return a shortened version of $PWD, just going back to the repo's
@@ -18,9 +28,9 @@ function svn_prompt_prefix
 
    [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|prefix\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && return
 
-   [[ $# -eq 0 ]] && ( 1=$(svn info 2> /dev/null | sed -n -e 's/^Repository Root: .*\///p' ) || return )
+   [[ $# -eq 0 ]] && ( 1=$(svn_prompt_root) || return )
 
-   echo -n ${$(pwd)#*/$1*}
+   echo -n ${$(pwd)#$1*}
 }
 
 # Function : svn_prompt_status

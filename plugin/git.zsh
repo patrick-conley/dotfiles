@@ -12,6 +12,14 @@
 # $ git status
 # to call both git_prompt_branch and git_prompt_status
 
+# Function : git_prompt_root
+# Arguments: N/A
+# Purpose  : Return the path to the current git repo
+function git_prompt_root
+{
+   echo $( git rev-parse --show-toplevel 2> /dev/null ) || return
+}
+
 # Function : git_prompt_prefix
 # Arguments: (optional) absolute path to the repo root with
 #            $ git rev-parse --show-toplevel
@@ -23,7 +31,7 @@ function git_prompt_prefix
    [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|prefix\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && return
 
    if [[ $# -eq 1 ]]; then
-      echo ${$(pwd)#$1} # 60% faster!
+      echo ${"$(pwd)"#$1} # 60% faster!
    else
       echo $(git rev-parse --show-prefix 2> /dev/null)
    fi
@@ -55,13 +63,17 @@ function git_prompt_status
 
    [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|status\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && echo -n $ZSH_THEME_REPO_UNKNOWN && return
 
+   # Get the status
    if [[ $# -eq 1 ]]; then
       gitstat=$1 # 40% faster
    else
-      gitstat=$(git status 2> /dev/null | grep '# \(Untracked\|Change\)') || return
+      gitstat=$(git status 2> /dev/null | grep '# \(Your\|Untracked\|Change\)') || return
    fi
 
+   # Set the output string
    stat_string=''
+
+   [[ -n $ZSH_THEME_REPO_AHEAD && $(echo ${gitstat} | grep -c "^# Your branch is ahead of" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_AHEAD
 
    [[ -n $ZSH_THEME_REPO_DIRTY && $(echo ${gitstat} | grep -c "^# Changes to be committed:$" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_DIRTY
 
