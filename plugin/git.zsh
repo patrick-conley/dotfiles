@@ -75,9 +75,9 @@ function git_prompt_status
 
    [[ -n $ZSH_THEME_REPO_AHEAD && $(echo ${gitstat} | grep -c "^# Your branch is ahead of" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_AHEAD
 
-   [[ -n $ZSH_THEME_REPO_DIRTY && $(echo ${gitstat} | grep -c "^# Changes to be committed:$" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_DIRTY
+   [[ -n $ZSH_THEME_REPO_DIRTY && $(echo ${gitstat} | grep -c "^# Changes \(to be committed\|not staged for commit\):" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_DIRTY
 
-   [[ -n $ZSH_THEME_REPO_UNTRACKED && $(echo ${gitstat} | grep -c "^# \(Untracked files\|Changed but not updated\|Changes not staged for commit\):$" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_UNTRACKED
+   [[ -n $ZSH_THEME_REPO_UNTRACKED && $(echo ${gitstat} | grep -c "^# \(Untracked files\|Changed but not updated\):" ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_UNTRACKED
 
    [[ -n $ZSH_THEME_REPO_CLEAN && ( $(echo ${gitstat} | grep -v '^$' | wc -l | tr -d ' ') == 0 ) ]] && stat_string+=$ZSH_THEME_REPO_CLEAN
 
