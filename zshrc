@@ -87,6 +87,7 @@ greppdf() # run grep on text in pdf files{{{2
 alias ls='ls --color=auto'
 alias la='ls -a'
 alias ll='ls -lh'
+alias du='du -sh'
 alias gcc='gcc -std=c99 -O -Wall'
 alias perlmod="h2xs -AX"
 
