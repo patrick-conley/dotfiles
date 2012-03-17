@@ -109,7 +109,7 @@ function zsh-prompt-pwd # {{{1
       fi
 
       # mercurial {{{2
-      if [[ -n $(hg root) ]]; then
+      if [[ -n $(hg root 2> /dev/null) ]]; then
          hg_prompt=(
             "☿ "
             "$(hg prompt --angle-brackets "<$ZSH_THEME_REPO_NAME_COLOR<root|basename>><$ZSH_THEME_REPO_PREFIX_COLOR/<root|prefix>><%{$reset_color%} on $ZSH_THEME_REPO_BRANCH_COLOR<branch>><$ZSH_THEME_REPO_DIRTY<boolstatus|modified>><$ZSH_THEME_REPO_UNTRACKED<boolstatus|unknown>>")"
