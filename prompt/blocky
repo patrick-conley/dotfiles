@@ -1,18 +1,19 @@
 #!/usr/bin/zsh
 
 # Patrick Conley <pconley@uvic.ca>
-# Last modified: 2012 Mar 16
+# Last modified: 2012 Mar 17
 #
 # Summary: A prompt that looks something like this:
 #
 # ⎡ Bellgrove in 2  ⎤   ~/
 # ⎣ 13 Feb at 12:14 ⎦ ≻                                                 4 :error
 #
-# (including git/svn information in the path)
+# (including git/svn/hg information in the path)
 # 
 
 source ~/.zsh/plugin/git.zsh
 source ~/.zsh/plugin/svn.zsh
+source ~/.zsh/plugin/hg.zsh
 
 ZSH_THEME_REPO_NAME_COLOR="%{$fg[yellow]%}"
 ZSH_THEME_REPO_PREFIX_COLOR="%{$fg[green]%}"
@@ -77,7 +78,7 @@ function zsh-prompt-pwd # {{{1
 {
 
    if [[ $( cat $ZSH_PROMPT_IGNORE 2> /dev/null | grep -c "all" ) -eq 0 ]]; then
-
+      # git {{{2
       git_root="$(git_prompt_root)"
       if [[ -n $git_root ]]; then
 
@@ -93,6 +94,7 @@ function zsh-prompt-pwd # {{{1
          echo -n ${(j::)git_prompt} && return
       fi
 
+      # svn {{{2
       svn_root=$(svn_prompt_root)
       if [[ -n $svn_root ]]; then
          svn_prompt=(
@@ -106,6 +108,17 @@ function zsh-prompt-pwd # {{{1
          echo -n ${(j::)svn_prompt} && return
       fi
 
+      # mercurial {{{2
+      if [[ -n $(hg root) ]]; then
+         hg_prompt=(
+            "☿ "
+            "$(hg prompt --angle-brackets "<$ZSH_THEME_REPO_NAME_COLOR<root|basename>><$ZSH_THEME_REPO_PREFIX_COLOR/<root|prefix>><%{$reset_color%} on $ZSH_THEME_REPO_BRANCH_COLOR<branch>><$ZSH_THEME_REPO_DIRTY<boolstatus|modified>><$ZSH_THEME_REPO_UNTRACKED<boolstatus|unknown>>")"
+            "%{$reset_color%}"
+         )
+
+         echo -n ${(j::)hg_prompt} && return
+      fi
+      # }}}2
    fi
 
    echo -n "  %{$fg[green]%}%~%{$reset_color%}" && return
