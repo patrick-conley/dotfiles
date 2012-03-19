@@ -25,7 +25,8 @@ uncommitted or untracked changes. Its behaviour is controlled by several
 variables, which must define both colour and output:
    
    ZSH_THEME_REPO_AHEAD     # printed if local branch is ahead of remote
-   ZSH_THEME_REPO_DIRTY     # printed if there are uncommitted changes
+   ZSH_THEME_REPO_MODIFIED  # printed if there are uncommitted changes
+   ZSH_THEME_REPO_DIRTY     # printed if unstaged changes exist
    ZSH_THEME_REPO_UNTRACKED # printed if there are untracked files
    ZSH_THEME_REPO_UNKNOWN   # printed if the status was not inspected
    ZSH_THEME_REPO_CLEAN     # printed if there are no changes

@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 # Patrick Conley <pconley@uvic.ca>
-# Last modified: 2012 Mar 17
+# Last modified: 2012 Mar 18
 #
 # Summary: A prompt that looks something like this:
 #
@@ -19,7 +19,8 @@ ZSH_THEME_REPO_NAME_COLOR="%{$fg[yellow]%}"
 ZSH_THEME_REPO_PREFIX_COLOR="%{$fg[green]%}"
 ZSH_THEME_REPO_BRANCH_COLOR="%{$fg[magenta]%}"
 ZSH_THEME_REPO_AHEAD="%{$fg[green]%}+"
-ZSH_THEME_REPO_DIRTY="%{$fg[green]%}!"
+ZSH_THEME_REPO_MODIFIED="%{$fg[green]%}!"
+ZSH_THEME_REPO_DIRTY="%{$fg[red]%}!"
 ZSH_THEME_REPO_UNTRACKED="%{$fg[green]%}?"
 ZSH_THEME_REPO_UNKNOWN="%{$fg[red]%}??"
 ZSH_THEME_REPO_CLEAN=""
@@ -112,7 +113,7 @@ function zsh-prompt-pwd # {{{1
       if [[ -n $(hg root 2> /dev/null) ]]; then
          hg_prompt=(
             "☿ "
-            "$(hg prompt --angle-brackets "<$ZSH_THEME_REPO_NAME_COLOR<root|basename>><$ZSH_THEME_REPO_PREFIX_COLOR/<root|prefix>><%{$reset_color%} on $ZSH_THEME_REPO_BRANCH_COLOR<branch>><$ZSH_THEME_REPO_AHEAD<outgoing>><$ZSH_THEME_REPO_DIRTY<boolstatus|modified>><$ZSH_THEME_REPO_UNTRACKED<boolstatus|unknown>>")"
+            "$(hg prompt --angle-brackets "<$ZSH_THEME_REPO_NAME_COLOR<root|basename>><$ZSH_THEME_REPO_PREFIX_COLOR/<root|prefix>><%{$reset_color%} on $ZSH_THEME_REPO_BRANCH_COLOR<branch>><$ZSH_THEME_REPO_AHEAD<outgoing>><$ZSH_THEME_REPO_MODIFIED<boolstatus|modified>><$ZSH_THEME_REPO_UNTRACKED<boolstatus|unknown>>")"
             "%{$reset_color%}"
          )
 

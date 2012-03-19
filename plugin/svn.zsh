@@ -44,7 +44,7 @@ function svn_prompt_status
 
    stat_string=''
 
-   [[ -n $ZSH_THEME_REPO_DIRTY && $( echo $svnstat | grep -c '^\s*[ACDM!]' ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_DIRTY
+   [[ -n $ZSH_THEME_REPO_MODIFIED && $( echo $svnstat | grep -c '^\s*[ACDM!]' ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_MODIFIED
 
    [[ -n $ZSH_THEME_REPO_UNTRACKED && $( echo $svnstat | grep -c '^\s*?' ) > 0 ]] && stat_string+=$ZSH_THEME_REPO_UNTRACKED
 
