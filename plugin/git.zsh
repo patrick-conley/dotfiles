@@ -31,7 +31,7 @@ function git_prompt_prefix
    [[ -e $ZSH_PROMPT_IGNORE && $( grep -c "^\(all\|prefix\)" $ZSH_PROMPT_IGNORE ) -gt 0 ]] && return
 
    if [[ $# -eq 1 ]]; then
-      echo ${"$(pwd)"#$1} # 60% faster!
+      echo ${"$(pwd -P)"#$1} # 60% faster!
    else
       echo $(git rev-parse --show-prefix 2> /dev/null)
    fi

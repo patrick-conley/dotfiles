@@ -24,6 +24,7 @@ EDITOR="/usr/bin/vim"
 WORDCHARS=${WORDCHARS//[\/]} # wordbreak on slashes
 
 path=( $HOME/bin/linux
+       $HOME/bin
        $HOME/bin/assist
        ./scripts # include any scripts in the current folder
        $HOME/.zsh/bin
