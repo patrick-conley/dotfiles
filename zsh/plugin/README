@@ -1,0 +1,53 @@
+
+Adding repository information to a prompt
+=========================================
+
+git.zsh svn.zsh
+
+These files define three functions to add information about a git or svn repo
+to the prompt string:
+
+   git_prompt_root
+   git_prompt_prefix
+   git_prompt_branch # no svn equivalent
+   git_prompt_status
+
+and similarly for svn. Some of these functions take an optional argument,
+which can in some circumstances reduce execution times. See each file for
+details.
+
+Calling *_prefix or *_branch will simply echo the
+prefix (the path from the repository root to the CWD) or branch name,
+respectively.
+
+*_status will echo some information about the repository: whether it has any
+uncommitted or untracked changes. Its behaviour is controlled by several
+variables, which must define both colour and output:
+   
+   ZSH_THEME_REPO_AHEAD     # printed if local branch is ahead of remote
+   ZSH_THEME_REPO_MODIFIED  # printed if there are uncommitted changes
+   ZSH_THEME_REPO_DIRTY     # printed if unstaged changes exist
+   ZSH_THEME_REPO_UNTRACKED # printed if there are untracked files
+   ZSH_THEME_REPO_UNKNOWN   # printed if the status was not inspected
+   ZSH_THEME_REPO_CLEAN     # printed if there are no changes
+
+These functions can run slowly on large repositories. Any or all of the repo
+functions will be ignored if the CWD contains the file given in
+
+   ZSH_PROMPT_IGNORE
+
+These functions can run slowly on large repositories (especially in svn).
+The following commands can be added to the file given by $ZSH_PROMPT_IGNORE to
+skip any or all of them:
+
+   all    # don't inspect the repo at all
+   prefix # don't try to find the prefix path
+   branch # don't try to find the branch name
+   status # don't try to analyse the repo status
+
+These words must each appear at the beginning of a line. Any line beginning
+with a '#' is guaranteed to be ignored.
+
+The file can be put in the CWD, or the repository base (.git, .svn, etc.).
+[not implemented] If it is found in the repository base, ignore options will
+be applied repo-wide.

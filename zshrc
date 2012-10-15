@@ -1,3 +1,7 @@
+# 
+# Link this file to ~/.zshrc
+#
+
 # Lines configured by zsh-newuser-install
 HISTFILE=~/.histfile
 HISTSIZE=1000
@@ -20,14 +24,12 @@ setopt hist_ignore_dups     # do not duplicate history entries
 setopt auto_param_slash     # add trailing slash when expanding path to a dir
 
 
-EDITOR="/usr/bin/vim"
+export EDITOR="/usr/bin/vim"
 WORDCHARS=${WORDCHARS//[\/]} # wordbreak on slashes
 
-path=( $HOME/bin/linux
-       $HOME/bin
-       $HOME/bin/assist
+path=( $HOME/bin
+       $HOME/bin/scripts
        ./scripts # include any scripts in the current folder
-       $HOME/.zsh/bin
        $path
      )
 
@@ -36,12 +38,12 @@ PERL5LIB="$PERL5LIB:$HOME/perl/share/perl"
 PERL5LIB="$PERL5LIB:$HOME/perl/lib/perl/5.12.4"
 export PERL5LIB
 
-
 # Set the prompts
 autoload -U colors && colors
 setopt prompt_subst
 
-source ~/.zsh/prompt/blocky
+ZSH_CONF_ROOT=~/.dotfiles/zsh
+source $ZSH_CONF_ROOT/prompt/blocky
 
 # Make less more friendly to pdfs
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -81,6 +83,22 @@ greppdf() # run grep on text in pdf files{{{2
       echo "   $file"
       pdftotext $file - | grep $1
    done
+}
+
+play() # play a music file from the terminal
+{
+   file=$( readlink -f $1 )
+
+   if [[ $file =~ ".ogg" ]]
+   then
+      gst-launch-0.10 playbin uri="file://$file"
+   elif [[ $file =~ "mp3" ]]
+   then
+      mpg123 $file
+   else
+      echo "No appropriate plugin exists for ${file##*.} files"
+   fi
+
 }
 
 # Aliases {{{1

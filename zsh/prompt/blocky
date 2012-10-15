@@ -1,0 +1,191 @@
+#!/usr/bin/zsh
+
+# Patrick Conley <pconley@uvic.ca>
+# Last modified: 2012 Oct 14
+#
+# Summary: A prompt that looks something like this:
+#
+# ⎡ Bellgrove in 2  ⎤   ~/
+# ⎣ 13 Feb at 12:14 ⎦ ≻                                                 4 :error
+#
+# (including git/svn/hg information in the path)
+
+if [[ -z $ZSH_CONF_ROOT ]]; then
+   ZSH_CONF_ROOT=".."
+fi
+
+source $ZSH_CONF_ROOT/plugin/git.zsh
+source $ZSH_CONF_ROOT/plugin/svn.zsh
+source $ZSH_CONF_ROOT/plugin/hg.zsh
+
+ZSH_THEME_REPO_NAME_COLOR="%{$fg[yellow]%}"
+ZSH_THEME_REPO_PREFIX_COLOR="%{$fg[green]%}"
+ZSH_THEME_REPO_BRANCH_COLOR="%{$fg[magenta]%}"
+ZSH_THEME_REPO_AHEAD="%{$fg[green]%}+"
+ZSH_THEME_REPO_MODIFIED="%{$fg[green]%}!"
+ZSH_THEME_REPO_DIRTY="%{$fg[red]%}!"
+ZSH_THEME_REPO_UNTRACKED="%{$fg[green]%}?"
+ZSH_THEME_REPO_UNKNOWN="%{$fg[red]%}??"
+ZSH_THEME_REPO_CLEAN=""
+
+ZSH_PROMPT_IGNORE=".zsh_prompt_ignore"
+
+function zsh-prompt-read-error # {{{1
+{
+
+   unset error
+
+   error_file=/tmp/$(whoami)-script-error
+   if [ ! -f $error_file ]
+   then
+      exit
+   fi
+   
+   error=$( cat $error_file )
+   rm $error_file
+
+   print "%{$fg[red]%}error: %{$reset_color%}%{$bg[red]%} $error %{$reset_color%}"
+
+}
+
+function zsh-prompt-padding # {{{1
+{
+
+   hoststring=$( uname -n )     # hostname
+   hoststring=${hoststring%%.local} # remove all suffixes
+
+   # set the number of characters needed to display the shell depth
+   shlvl_length=0
+   if [[ $SHLVL -gt 1 ]]
+   then
+      (( shlvl_length = ${#SHLVL} + 4 ))
+   fi
+
+   # the minimum length of each line
+   (( ps1_upper_length = ${#hoststring} + $shlvl_length ))
+   ps1_lower_length=15
+
+   # set which line we're padding
+   if [[ $1 == 'up' ]]
+   then
+      (( padding = ps1_lower_length - ps1_upper_length ))
+   elif [[ $1 == 'low' ]]
+   then
+      (( padding = ps1_upper_length - ps1_lower_length ))
+   fi
+
+
+   repeat $padding printf ' '
+} 
+
+function zsh-prompt-pwd # {{{1
+{
+
+   if [[ $( cat $ZSH_PROMPT_IGNORE 2> /dev/null | grep -c "all" ) -eq 0 ]]; then
+      # git {{{2
+      git_root="$(git_prompt_root)"
+      if [[ -n $git_root ]]; then
+
+         git_prompt=(
+            "∓ "
+            "$ZSH_THEME_REPO_NAME_COLOR" "${git_root##*/}"
+            "$ZSH_THEME_REPO_PREFIX_COLOR" "$(git_prompt_prefix $git_root)"
+            "%{$reset_color%} on " "$ZSH_THEME_REPO_BRANCH_COLOR" "$(git_prompt_branch)"
+            "$(git_prompt_status)"
+            "%{$reset_color%}"
+         )
+
+         echo -n ${(j::)git_prompt} && return
+      fi
+
+      # svn {{{2
+      svn_root=$(svn_prompt_root)
+      if [[ -n $svn_root ]]; then
+         svn_prompt=(
+            "𝓢 "
+            "$ZSH_THEME_REPO_NAME_COLOR" "${svn_root##*/}"
+            "$ZSH_THEME_REPO_PREFIX_COLOR" "$(svn_prompt_prefix $svn_root)"
+            "$(svn_prompt_status)"
+            "%{$reset_color%}"
+         )
+
+         echo -n ${(j::)svn_prompt} && return
+      fi
+
+      # mercurial {{{2
+      if [[ -n $(hg root 2> /dev/null) ]]; then
+         hg_prompt=(
+            "☿ "
+            "$(hg prompt --angle-brackets "<$ZSH_THEME_REPO_NAME_COLOR<root|basename>><$ZSH_THEME_REPO_PREFIX_COLOR/<root|prefix>><%{$reset_color%} on $ZSH_THEME_REPO_BRANCH_COLOR<branch>><$ZSH_THEME_REPO_AHEAD<outgoing>><$ZSH_THEME_REPO_MODIFIED<boolstatus|modified>><$ZSH_THEME_REPO_UNTRACKED<boolstatus|unknown>>")"
+            "%{$reset_color%}"
+         )
+
+         echo -n ${(j::)hg_prompt} && return
+      fi
+      # }}}2
+   fi
+
+   echo -n "  %{$fg[green]%}%~%{$reset_color%}" && return
+
+}
+
+# }}}1
+
+ps1_upper_head=(
+   "%{$fg[cyan]%}⎡%{$reset_color%} "
+)
+
+ps1_upper_body=( 
+   "%{$fg_bold[red]%}"
+   "%m"                                                # hostname
+   "%{$reset_color%}"
+
+   "%(2L.%B in %b%{$fg[yellow]%}%L%{$reset_color%}.)" # shell depth
+
+)
+
+ps1_upper_tail=(
+   " %{$fg[cyan]%}⎤%{$reset_color%} "
+   # add the path here in $PS1 (from function eval)
+)
+
+ps1_lower_head=(
+   "%{$fg[cyan]%}⎣%{$reset_color%} "
+)
+
+ps1_lower_body=(
+   "%{$fg_bold[yellow]%}"
+   "%D{%d %b at %H:%M}"                        # date & time
+   "%{$reset_color%}"
+)
+
+ps1_lower_tail=(
+   " %{$fg[cyan]%}⎦%{$reset_color%}"
+   " %{%(!.$fg_bold[red].$fg_bold[cyan])%}"
+   "≻ "                                    # prompt char
+   "%{$reset_color%}"
+)
+
+PS1='
+${(j::)ps1_upper_head}${(j::)ps1_upper_body}$(zsh-prompt-padding up)${(j::)ps1_upper_tail}$(zsh-prompt-pwd)
+${(j::)ps1_lower_head}$(zsh-prompt-padding low)${(j::)ps1_lower_body}${(j::)ps1_lower_tail}'
+
+ps2=( 
+   "%{$fg_bold[cyan]%}"
+   "%_ "
+   "%{$fg_bold[red]%}"
+   "> "
+   "%{$reset_color%}"
+)
+PS2=${(j::)ps2}
+
+errorstring=(
+   "%{$fg[red]%}"
+   "error: "
+   "%{$reset_color%}"
+   "%{$bg[red]%}"
+   " %? "
+   "%{$reset_color%}"
+)
+
+RPROMPT='%(?.$(zsh-prompt-read-error).${(j::)errorstring})'
