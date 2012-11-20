@@ -23,6 +23,7 @@ setopt rm_star_silent       # do not query on rm *
 setopt hist_ignore_dups     # do not duplicate history entries
 setopt auto_param_slash     # add trailing slash when expanding path to a dir
 
+export XDG_CONFIG_HOME=$HOME/.config
 
 export EDITOR="/usr/bin/vim"
 WORDCHARS=${WORDCHARS//[\/]} # wordbreak on slashes
@@ -44,6 +45,8 @@ setopt prompt_subst
 
 ZSH_CONF_ROOT=~/.dotfiles/zsh
 source $ZSH_CONF_ROOT/prompt/blocky
+
+source $ZSH_CONF_ROOT/plugin/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Make less more friendly to pdfs
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -104,6 +107,7 @@ play() # play a music file from the terminal
 # Aliases {{{1
 
 alias ls='ls --color=auto'
+alias grep='grep --color=auto'
 alias la='ls -a'
 alias ll='ls -lh'
 alias du='du -sh'

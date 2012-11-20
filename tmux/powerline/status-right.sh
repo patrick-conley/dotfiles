@@ -59,7 +59,7 @@ cpu+=(["script"]="${segments_path}/cpu.sh")
 cpu+=(["foreground"]="colour136")
 cpu+=(["background"]="colour240")
 cpu+=(["separator"]="${separator_left_bold}")
-register_segment "cpu"
+ # register_segment "cpu"
 
 declare -A load
 load+=(["script"]="${segments_path}/load.sh")
@@ -81,7 +81,7 @@ register_segment "battery"
 
 declare -A weather
 weather+=(["script"]="${segments_path}/weather_yahoo.sh")
-#weather+=(["script"]="${segments_path}/weather_google.sh")
+ # weather+=(["script"]="${segments_path}/weather_google.sh")
 weather+=(["foreground"]="colour255")
 weather+=(["background"]="colour37")
 weather+=(["separator"]="${separator_left_bold}")
