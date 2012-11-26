@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 # Patrick Conley <pconley@uvic.ca>
-# Last modified: 2012 Oct 14
+# Last modified: 2012 Nov 21
 #
 # Summary: A prompt that looks something like this:
 #
@@ -62,7 +62,7 @@ function zsh-prompt-padding # {{{1
    fi
 
    # the minimum length of each line
-   (( ps1_upper_length = ${#hoststring} + $shlvl_length ))
+   (( ps1_upper_length = ${#hoststring} + $shlvl_length + 1 ))
    ps1_lower_length=15
 
    # set which line we're padding
@@ -145,7 +145,7 @@ ps1_upper_body=(
 )
 
 ps1_upper_tail=(
-   " %{$fg[cyan]%}⎤%{$reset_color%} "
+   "𝔃 %{$fg[cyan]%}⎤%{$reset_color%} "
    # add the path here in $PS1 (from function eval)
 )
 
