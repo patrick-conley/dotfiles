@@ -9,6 +9,7 @@
 # - if a vcs command is called (eg., `git`), call the appropriate vcs's redraw
 #   function. May be possible with --on-event), or I may wrap functions
 #   around all the vcs commands that call __prompt_set_cwd
+set -g __prompt_colour_pwd (set_color green)
 
 touch /home/pconley/temp/fish-reload
 

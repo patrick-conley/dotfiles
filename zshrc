@@ -44,7 +44,7 @@ autoload -U colors && colors
 setopt prompt_subst
 
 ZSH_CONF_ROOT=~/.dotfiles/zsh
-source $ZSH_CONF_ROOT/prompt/blocky
+source $ZSH_CONF_ROOT/prompt/timeless
 
 source $ZSH_CONF_ROOT/plugin/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 

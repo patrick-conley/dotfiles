@@ -40,6 +40,8 @@ function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell,
    # lower level
    echo -n "$__prompt_colour_block$__prompt_char_blockl3[$__prompt_has_unicode] "
 
+   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_has_unicode] "
+
    # print status
    if not test $last_status -eq 0
       echo -n "$__prompt_colour_normal($__prompt_colour_status$last_status$__prompt_colour_normal) "
@@ -56,10 +58,8 @@ end
 
 function __prompt_set_timeless_host --description "Set the host area of the prompt"
 
-   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_has_unicode] "
-
    # set & draw the hostname
-   set -l p_host (hostname -s)
+   set -l p_host (hostname)
    echo -n "$__prompt_colour_host$p_host$__prompt_colour_normal"
 
    # set & draw the shell depth

@@ -132,7 +132,7 @@ function zsh-prompt-pwd # {{{1
 # }}}1
 
 ps1_upper_head=(
-   "%{$fg[cyan]%}⎡%{$reset_color%} "
+   "%{$fg[cyan]%}⎧%{$reset_color%} "
 )
 
 ps1_upper_body=( 
@@ -140,35 +140,23 @@ ps1_upper_body=(
    "%m"                                                # hostname
    "%{$reset_color%}"
 
-   "%(2L.%B in %b%{$fg[yellow]%}%L%{$reset_color%}.)" # shell depth
-
-)
-
-ps1_upper_tail=(
-   "𝓩 %{$fg[cyan]%}⎤%{$reset_color%} "
-   # add the path here in $PS1 (from function eval)
+   "%(2L.+.) " # shell depth
 )
 
 ps1_lower_head=(
-   "%{$fg[cyan]%}⎣%{$reset_color%} "
-)
-
-ps1_lower_body=(
-   "%{$fg_bold[yellow]%}"
-   "%D{%d %b at %H:%M}"                        # date & time
-   "%{$reset_color%}"
+   "%{$fg[cyan]%}⎩%{$reset_color%} "
 )
 
 ps1_lower_tail=(
-   " %{$fg[cyan]%}⎦%{$reset_color%}"
-   " %{%(!.$fg_bold[red].$fg_bold[cyan])%}"
+   "𝓩 "
+   "%{%(!.$fg_bold[red].$fg_bold[cyan])%}"
    "≻ "                                    # prompt char
    "%{$reset_color%}"
 )
 
 PS1='
-${(j::)ps1_upper_head}${(j::)ps1_upper_body}$(zsh-prompt-padding up)${(j::)ps1_upper_tail}$(zsh-prompt-pwd)
-${(j::)ps1_lower_head}$(zsh-prompt-padding low)${(j::)ps1_lower_body}${(j::)ps1_lower_tail}'
+${(j::)ps1_upper_head}${(j::)ps1_upper_body}$(zsh-prompt-pwd)
+${(j::)ps1_lower_head}${(j::)ps1_lower_tail}'
 
 ps2=( 
    "%{$fg_bold[cyan]%}"
