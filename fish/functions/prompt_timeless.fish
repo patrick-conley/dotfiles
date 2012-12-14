@@ -9,8 +9,8 @@ set -g __prompt_char_blockl1 "|" "⎧" # ⎛⎡⎧ ⌠
 set -g __prompt_char_blockl3 "|" "⎩" # ⎝⎣⎩ ⌡
 set -g __prompt_char_arrow ">" "≻"
 set -g __prompt_char_shell "fish" "♓"
-set -g __prompt_char_linux "(linux)" "" # Tux (fonts-linuxlibertine)
-set -g __prompt_char_mac "(os x)" "⌘ "
+set -g __prompt_char_linux " (linux)" "" # Tux (fonts-linuxlibertine)
+set -g __prompt_char_mac " (os x)" "⌘ "
 set -g __prompt_char_ubuntu "" "" # Ubuntu logo (ubuntu font)
 
 touch /home/pconley/temp/fish-reload

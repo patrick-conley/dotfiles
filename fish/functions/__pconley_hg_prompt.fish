@@ -47,7 +47,8 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
 
    # path to the repo root
    # based on prompt_pwd
-   set -l path_head (echo $root | sed 's/[^/]*$//' | sed -e "s-^$HOME-~-" -e 's-\([^/]\)[^/]*/-\1/-g') 
+ #    set -l path_head (echo $root | sed 's/[^/]*$//' | sed -e "s-^$HOME-~-" -e 's-\([^/]\)[^/]*/-\1/-g') 
+   set -l path_head (echo $root | sed 's/[^/]*$//' | sed -e "s-^$HOME-~-" -e 's-\([^/]\{1,4\}\)[^/]*/-\1/-g')
 
    echo -n $__prompt_colour_vcs_path
    echo -n $path_head

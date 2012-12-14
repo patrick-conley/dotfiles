@@ -80,7 +80,7 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    # path to the repo (everything before the repo root)
    # based on prompt_pwd
    set -l path_head (echo $path[1] | sed 's/[^/]*$//') # truncate the root
-   set path_head (echo $path_head | sed -e "s-^$HOME-~-" -e 's-\([^/]\)[^/]*/-\1/-g')
+   set path_head (echo $path_head | sed -e "s-^$HOME-~-" -e 's-\([^/]\{1,4\}\)[^/]*/-\1/-g')
 
    echo -n $__prompt_colour_vcs_path
    echo -n $path_head
