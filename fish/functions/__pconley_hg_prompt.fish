@@ -21,7 +21,7 @@ set -gx __prompt_colour_vcs_unmerged (set_color red)
 set -gx __prompt_vcs_status_untracked '?'
 set -gx __prompt_vcs_status_unmerged '!'
 
-set -g __prompt_char_hg "hg" "☿"
+set -gx __prompt_char_hg "hg" "☿"
 
 touch /home/pconley/temp/fish-reload
 
@@ -47,7 +47,6 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
 
    # path to the repo root
    # based on prompt_pwd
- #    set -l path_head (echo $root | sed 's/[^/]*$//' | sed -e "s-^$HOME-~-" -e 's-\([^/]\)[^/]*/-\1/-g') 
    set -l path_head (echo $root | sed 's/[^/]*$//' | sed -e "s-^$HOME-~-" -e 's-\([^/]\{1,4\}\)[^/]*/-\1/-g')
 
    echo -n $__prompt_colour_vcs_path

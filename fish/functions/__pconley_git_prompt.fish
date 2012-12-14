@@ -47,8 +47,9 @@ set -gx __prompt_colour_vcs_unmerged (set_color red)
  # set -gx __prompt_vcs_status_deleted '✖'
 set -gx __prompt_vcs_status_untracked '?'
 set -gx __prompt_vcs_status_unmerged '!'
+set -gx __prompt_vcs_status_ahead '+'
 
-set -g __prompt_char_git "git" "∓"
+set -gx __prompt_char_git "git" "∓"
 
 touch /home/pconley/temp/fish-reload
 
@@ -108,7 +109,9 @@ function __pconley_git_prompt --description 'Write out the git prompt'
 
    # get the repo's status
    set -l index ""
+   set -l ahead ""
 
+   # get the status
    if test (count $argv) -eq 0
       set index (git status --short --branch ^/dev/null | sort -u)
       set -g __prompt_vcs_last_stat "$index"
@@ -116,11 +119,21 @@ function __pconley_git_prompt --description 'Write out the git prompt'
       set index $argv
    end
 
+   # check whether local is ahead of origin
+   if test (echo $index | grep "^## .* \[ahead [0-9]*\]")
+      set ahead 1
+   end
+
    # a clean repo will only have set the branch name
    if test (count $index) -le 1
       echo -n $__prompt_colour_vcs_clean
       echo -n $path[(count $path)]
+
+      # notify if local is ahead of origin
       set_color normal
+      if test $ahead
+         echo -n $__prompt_vcs_status_ahead
+      end
       return
    end
 
@@ -155,8 +168,16 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    # Print the branch and status
    #
 
+   # branch name
    echo -n $path[(count $path)]
 
+   # local ahead of origin
+   if test $ahead
+      set_color normal
+      echo -n $__prompt_vcs_status_ahead
+   end
+
+   # repo status
    for i in $status_order
       if contains $i in $gs
         set -l color_name __prompt_colour_vcs_$i
