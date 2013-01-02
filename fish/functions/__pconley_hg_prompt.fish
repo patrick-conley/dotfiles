@@ -59,7 +59,8 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
    # path in the repo
    if test $root != $PWD
       echo -n $__prompt_colour_vcs_prefix
-      echo -n ( echo $PWD | sed "s-$root--" )
+      set -l escaped_root ( echo $root | sed -e 's-/-\\\\/-g' )
+      echo -n ( echo $PWD | sed "s/$escaped_root//" )
    end
 
    set_color normal
