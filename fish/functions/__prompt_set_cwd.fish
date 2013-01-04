@@ -36,10 +36,12 @@ function __prompt_set_cwd --on-variable PWD --description "Event handler: reset 
    set -g __prompt_vcs_type ""
    set -g __prompt_vcs_last_stat ""
 
-   set -g __prompt_cwd "$__prompt_colour_pwd " (pwd | sed -e "s-^$HOME-~-" )
+   # Not under VCS: print the cwd
+   set -g __prompt_cwd (pwd | sed -e "s-^$HOME-~-" )
+   set -g __prompt_cwd $__prompt_colour_pwd (__prompt_cwd_trunc $__prompt_cwd)
 end
 
-function __prompt_check_cwd
+function __prompt_check_cwd --description "Check whether the CWD has changed"
 
    # If the CWD is not a repository, reuse the last prompt (__prompt_set_cwd
    # will set __prompt_vcs_type if the CWD changes to a repo)
@@ -66,4 +68,66 @@ function __prompt_check_cwd
       end
 
    end
+end
+
+# Try to ensure long paths don't overflow the line
+function __prompt_cwd_trunc --description "Limit the length of the CWD string"
+
+   # tokenize the CWD
+   set -l cwd_tokens (echo $argv[1] | grep -o "[^/]*")
+
+   # set the maximum allowed length
+   set -g cwd_max_allowed 60
+   if set -q __prompt_cwd_prefix_len
+      set cwd_max_allowed (math (tput cols)-$__prompt_cwd_prefix_len-2)
+   end
+
+   if test (expr length $argv[1]) -le $cwd_max_allowed
+      echo -n $argv[1]
+   else
+
+      # the last directory in the tree must display in full
+      set -l last_dir_len ( expr length ( echo $argv[1] | grep -o '[^/]*$' ) )
+
+      set -l cwd_depth (echo $argv[1] | grep -o "/" | wc -l )
+      set -l char_lim (math $cwd_max_allowed-$last_dir_len)
+
+      set -l max_per_dir (math "$char_lim/$cwd_depth" )
+
+      # Short directory names give me extra characters to play with
+      for dir in $cwd_tokens
+         if test (expr length $dir) -lt $max_per_dir
+            set char_lim (math $char_lim+$max_per_dir-(expr length $dir))
+         end
+      end
+
+      # FIXME: if max_per_dir goes over six, then it gets reduced and even 5
+      # or 6-character directories get truncated
+
+      # Put ellipses in the replacement
+      set max_per_dir (math "$char_lim/$cwd_depth")
+      set repl_char ""
+      if test $max_per_dir -ge 6
+         set max_per_dir (math $max_per_dir-2)
+         set repl_char ".."
+      end
+
+      # Overflow if we have to, but make sure the directory names are readable
+      if test $max_per_dir -lt 3
+         set max_per_dir 3
+      end
+
+      # set the path; add ellispes if there's room
+      for dir in $cwd_tokens[1..(math (count $cwd_tokens)-1)]
+         if test (expr length $dir) -gt $max_per_dir
+            echo -n $dir | sed -e "s/\(.\{1,$max_per_dir\}\).*/\1$repl_char/"
+            echo -n "/"
+         else
+            echo -n "$dir/"
+         end
+      end
+
+      echo -n $cwd_tokens[(count $cwd_tokens)]
+   end
+   
 end

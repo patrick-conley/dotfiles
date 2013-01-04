@@ -60,25 +60,30 @@ function __prompt_set_timeless_host --description "Set the host area of the prom
 
    # set & draw the hostname
    set -l p_host (hostname)
+   set -l len (expr length $p_host)
    echo -n "$__prompt_colour_host$p_host$__prompt_colour_normal"
 
    # set & draw the shell depth
-   set -l p_shlvl $__prompt_colour_normal
    if test $SHLVL -gt 1
-      set p_shlvl "+"
+      echo -n "+"
+      set len (math $len+1)
    end
-   echo -n $p_shlvl
 
    set -l os (uname)
    if test $os = "Linux"
       set -l os (cat /etc/issue)
       if test (echo $os | grep "Ubuntu")
          echo -n "$__prompt_char_ubuntu[$__prompt_has_unicode]"
+         set len (math $len+(expr length $__prompt_char_ubuntu[$__prompt_has_unicode]))
       end
       echo -n "$__prompt_char_linux[$__prompt_has_unicode]"
+      set len (math $len+(expr length $__prompt_char_linux[$__prompt_has_unicode]))
    else if test $os = "Darwin"
       echo -n "$__prompt_char_mac[$__prompt_has_unicode]"
+      set len (math $len+(expr length $__prompt_char_mac[$__prompt_has_unicode]))
    end
+
+   set -g __prompt_cwd_prefix_len $len
 
 end
 
