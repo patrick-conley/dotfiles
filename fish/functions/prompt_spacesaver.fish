@@ -19,7 +19,7 @@ set -g __prompt_char_shell "fish" "♓"
 touch /home/pconley/temp/fish-reload
 
 function prompt_spacesaver --description 'Three-line prompt with time, shell, status, cwd, and vcs info'
-   set -l last_status $status
+   set -l last_status $argv[1]
 
    # set some variables
    if test -z "$__prompt_cwd"

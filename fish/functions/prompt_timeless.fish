@@ -16,7 +16,7 @@ set -g __prompt_char_ubuntu "" "" # Ubuntu logo (ubuntu font)
 touch /home/pconley/temp/fish-reload
 
 function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell, status, cwd, and vcs info'
-   set -l last_status $status
+   set -l last_status $argv[1]
 
    # set some variables
    if not set -q __prompt_timeless_host

@@ -17,7 +17,7 @@ set -g __prompt_char_shell "fish" "♓"
 touch /home/pconley/temp/fish-reload
 
 function prompt_block --description 'Two-line prompt with time, host, SHLVL, shell, status, cwd, and vcs info'
-   set -l last_status $status
+   set -l last_status $argv[1]
 
    # set some variables
    if not set -q __prompt_block_host

@@ -3,12 +3,14 @@ set -g prompt_name 'timeless'
 touch /home/pconley/temp/fish-reload
 
 function fish_prompt --description 'Write out the prompt'
+   set -l last_status $status
+
    # Try to use the default first: the time needed to run the test is
    # negligible, while that for eval is large
    if test $prompt_name = "timeless"
-      prompt_timeless
+      prompt_timeless $last_status
    else
-      eval prompt_$prompt_name
+      eval prompt_$prompt_name $last_status
    end
 end
 
