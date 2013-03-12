@@ -4,11 +4,16 @@ set -g __prompt_colour_host (set_color -o red)
 set -g __prompt_colour_normal (set_color normal)
 set -g __prompt_colour_status (set_color red)
 
+set -g __prompt_char_shlvl "+"
+set -g __prompt_char_pwdl "("
+set -g __prompt_char_pwdr ")"
+
 set -g __prompt_has_unicode 2
 set -g __prompt_char_blockl1 "|" "⎧" # ⎛⎡⎧ ⌠
 set -g __prompt_char_blockl3 "|" "⎩" # ⎝⎣⎩ ⌡
 set -g __prompt_char_arrow ">" "≻"
-set -g __prompt_char_shell "fish" "♓"
+set -g __prompt_char_arrow_nowrite ">" "⊁"
+set -g __prompt_char_shell "fish" "♒"
 set -g __prompt_char_linux " (linux)" "" # Tux (fonts-linuxlibertine)
 set -g __prompt_char_mac " (os x)" "⌘ "
 set -g __prompt_char_ubuntu "" "" # Ubuntu logo (ubuntu font)
@@ -42,32 +47,40 @@ function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell,
 
    echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_has_unicode] "
 
-   # print status
+   set -l arrow
+   if test -w $PWD
+      set arrow $__prompt_char_arrow[$__prompt_has_unicode]
+   else
+      set arrow $__prompt_char_arrow_nowrite[$__prompt_has_unicode]
+   end
+
+   # print last command's status
    if not test $last_status -eq 0
       echo -n "$__prompt_colour_normal($__prompt_colour_status$last_status$__prompt_colour_normal) "
    end
 
+   # print the prompt arrow
    if test -e "/home/pconley/temp/fish-reload"
-      echo -n "$__prompt_colour_status$__prompt_char_arrow[$__prompt_has_unicode] $__prompt_colour_normal"
+      echo -n "$__prompt_colour_status$arrow $__prompt_colour_normal"
       rm "/home/pconley/temp/fish-reload"
    else
-      echo -n "$__prompt_colour_normal$__prompt_char_arrow[$__prompt_has_unicode] $__prompt_colour_normal"
+      echo -n "$__prompt_colour_normal$arrow $__prompt_colour_normal"
    end
 
 end
 
 function __prompt_set_timeless_host --description "Set the host area of the prompt"
 
+   # set & draw the shell depth
+   if test $SHLVL -gt 1
+      echo -n "$__prompt_colour_normal$__prompt_char_shlvl"
+      set len (math $len+1)
+   end
+
    # set & draw the hostname
    set -l p_host (hostname)
    set -l len (expr length $p_host)
    echo -n "$__prompt_colour_host$p_host$__prompt_colour_normal"
-
-   # set & draw the shell depth
-   if test $SHLVL -gt 1
-      echo -n "+"
-      set len (math $len+1)
-   end
 
    set -l os (uname)
    if test $os = "Linux"

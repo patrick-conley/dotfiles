@@ -60,7 +60,7 @@ function __prompt_check_cwd --description "Check whether the CWD has changed"
 
    # If the CWD is a mercurial repo, go as with git
    else if test $__prompt_vcs_type = "hg"
-      set -l temp_status (hg status ^/dev/null)
+      set -l temp_status (hg status -q ^/dev/null)
 
       if test "$temp_status" != "$__prompt_vcs_last_stat"
          set -g __prompt_cwd (__pconley_hg_prompt $temp_status)

@@ -37,10 +37,6 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
       return
    end
 
-   # print the repo ID
-   set_color normal
-   echo -n "$__prompt_char_hg[$__prompt_has_unicode] "
-
    # 
    # print the path to CWD
    #
@@ -63,8 +59,9 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
       echo -n ( echo $PWD | sed "s/$escaped_root//" )
    end
 
+   # print the repo ID
    set_color normal
-   echo -n ' | '
+   echo -n "$__prompt_char_hg[$__prompt_has_unicode] "
 
    # 
    # Test whether the repo is clean

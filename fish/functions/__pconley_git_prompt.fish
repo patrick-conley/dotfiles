@@ -49,7 +49,7 @@ set -gx __prompt_vcs_status_untracked '?'
 set -gx __prompt_vcs_status_unmerged '!'
 set -gx __prompt_vcs_status_ahead '+'
 
-set -gx __prompt_char_git "git" "∓"
+set -gx __prompt_char_git "git" "±"
 
 touch /home/pconley/temp/fish-reload
 
@@ -70,10 +70,6 @@ function __pconley_git_prompt --description 'Write out the git prompt'
       set path[(count $path)] "initial commit"
    end
 
-   # print the repo ID
-   set_color normal
-   echo -n "$__prompt_char_git[$__prompt_has_unicode] " 
-
    #
    # Print the path to CWD
    #
@@ -83,6 +79,7 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    set -l path_head (echo $path[1] | sed 's/[^/]*$//') # truncate the root
    set path_head (echo $path_head | sed -e "s-^$HOME-~-" -e 's-\([^/]\{1,4\}\)[^/]*/-\1/-g')
 
+   echo -n "$__prompt_colour_block$__prompt_char_pwdl"
    echo -n $__prompt_colour_vcs_path
    echo -n $path_head
 
@@ -99,9 +96,11 @@ function __pconley_git_prompt --description 'Write out the git prompt'
       echo -n $__prompt_colour_vcs_prefix
       echo -n "/$path_tail"
    end
+   echo -n "$__prompt_colour_block$__prompt_char_pwdr"
 
+   # print the repo ID
    set_color normal
-   echo -n ' | '
+   echo -n " $__prompt_char_git[$__prompt_has_unicode] " 
 
    #
    # Test whether the repo is clean
