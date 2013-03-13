@@ -68,6 +68,7 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
    #
 
    # get the repo's status
+   # It may have been passed to this function by check_pwd
    set -l index ""
 
    if test (count $argv) -eq 0

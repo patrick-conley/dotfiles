@@ -107,10 +107,10 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    #
 
    # get the repo's status
+   # It may have been passed to this function by check_pwd
    set -l index ""
    set -l ahead ""
 
-   # get the status
    if test (count $argv) -eq 0
       set index (git status --short --branch ^/dev/null | sort -u)
       set -g __prompt_vcs_last_stat "$index"
