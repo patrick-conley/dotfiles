@@ -14,60 +14,51 @@ set -g __prompt_colour_pwd (set_color green)
 touch /home/pconley/temp/fish-reload
 
 # reset everything 
+# Set __prompt_cwd and __prompt_arrow
 function __prompt_set_cwd --on-variable PWD --description "Event handler: reset the cwd"
 
-   # Check if this is a git repo
+   # git
    set -l temp_status (git status --short --branch ^/dev/null)
-
    if test (count $temp_status) -gt 0
       set -g __prompt_vcs_type "git"
       set -g __prompt_cwd (__pconley_git_prompt $temp_status)
       set -g __prompt_vcs_last_stat "$temp_status"
-      return
-   end
 
-   # Check if it is a mercurial repo
-   if not test -z (hg root ^/dev/null)
+   # mercurial
+   else if not test -z (hg root ^/dev/null)
       set -g __prompt_vcs_type "hg"
       set -g __prompt_cwd (__pconley_hg_prompt)
-      return
+
+   # not a VCS
+   else
+      set -g __prompt_vcs_type ""
+      set -g __prompt_vcs_last_stat ""
+
+      # derive the prompt manually
+      set -l cwd (__prompt_cwd_trunc (pwd | sed -e "s-^$HOME-~-" ))
+      set -g __prompt_cwd "$__prompt_colour_block$__prompt_char_pwdl"
+      set -g __prompt_cwd "$__prompt_cwd$__prompt_colour_pwd$cwd"
+      set -g __prompt_cwd "$__prompt_cwd$__prompt_colour_block$__prompt_char_pwdr"
+      set -l stack (__prompt_get_dirs)
+      set -g __prompt_cwd "$__prompt_cwd$__prompt_colour_normal$stack"
    end
 
-   set -g __prompt_vcs_type ""
-   set -g __prompt_vcs_last_stat ""
+   # Set the prompt character (depending whether I can write)
+   if test -w $PWD
+      set -g __prompt_arrow $__prompt_char_arrow[$__prompt_utf8]
+   else
+      set -g __prompt_arrow $__prompt_char_arrow_nowrite[$__prompt_utf8]
+   end
 
-   # Not under VCS: print the cwd
-   set -g __prompt_cwd (pwd | sed -e "s-^$HOME-~-" )
-   set -g __prompt_cwd $__prompt_colour_pwd (__prompt_cwd_trunc $__prompt_cwd)
 end
 
-function __prompt_check_cwd --description "Check whether the CWD has changed"
+function __prompt_get_dirs --description "Check whether pushd has been used"
 
-   # If the CWD is not a repository, reuse the last prompt (__prompt_set_cwd
-   # will set __prompt_vcs_type if the CWD changes to a repo)
-   if not set -q __prompt_vcs_type
-      return
-
-   # If the CWD is a git repo, check its status and update the prompt if it's
-   # changed
-   else if test $__prompt_vcs_type = "git"
-      set -l temp_status (git status --short --branch ^/dev/null)
-
-      if test "$temp_status" != "$__prompt_vcs_last_stat"
-         set -g __prompt_cwd (__pconley_git_prompt $temp_status)
-         set -g __prompt_vcs_last_stat "$temp_status"
-      end
-
-   # If the CWD is a mercurial repo, go as with git
-   else if test $__prompt_vcs_type = "hg"
-      set -l temp_status (hg status -q ^/dev/null)
-
-      if test "$temp_status" != "$__prompt_vcs_last_stat"
-         set -g __prompt_cwd (__pconley_hg_prompt $temp_status)
-         set -g __prompt_vcs_last_stat "$temp_status"
-      end
-
+   # Check the depth of the directory stack
+   if test (count (echo (dirs) | sed -e "s/  /\n/g" )) -gt 2
+      echo -n "$__prompt_char_pushd[$__prompt_utf8]"
    end
+
 end
 
 # Try to ensure long paths don't overflow the line
@@ -82,6 +73,7 @@ function __prompt_cwd_trunc --description "Limit the length of the CWD string"
       set cwd_max_allowed (math (tput cols)-$__prompt_cwd_prefix_len-2)
    end
 
+   # Just print the CWD if it's short enough
    if test (expr length $argv[1]) -le $cwd_max_allowed
       echo -n $argv[1]
    else

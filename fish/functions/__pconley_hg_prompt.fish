@@ -58,10 +58,12 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
       set -l escaped_root ( echo $root | sed -e 's-/-\\\\/-g' )
       echo -n ( echo $PWD | sed "s/$escaped_root//" )
    end
+   set -l stack (__prompt_get_dirs)
+   echo -n "$__prompt_colour_normal$stack"
 
    # print the repo ID
    set_color normal
-   echo -n "$__prompt_char_hg[$__prompt_has_unicode] "
+   echo -n "$__prompt_char_hg[$__prompt_utf8] "
 
    # 
    # Test whether the repo is clean

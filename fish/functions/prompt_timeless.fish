@@ -4,11 +4,12 @@ set -g __prompt_colour_host (set_color -o red)
 set -g __prompt_colour_normal (set_color normal)
 set -g __prompt_colour_status (set_color red)
 
-set -g __prompt_char_shlvl "+"
-set -g __prompt_char_pwdl "("
-set -g __prompt_char_pwdr ")"
+set -g __prompt_char_shlvl "+" 
+set -g __prompt_char_pwdl "(" 
+set -g __prompt_char_pwdr ")" 
+set -g __prompt_char_pushd "+" "+"
 
-set -g __prompt_has_unicode 2
+set -g __prompt_utf8 2
 set -g __prompt_char_blockl1 "|" "⎧" # ⎛⎡⎧ ⌠
 set -g __prompt_char_blockl3 "|" "⎩" # ⎝⎣⎩ ⌡
 set -g __prompt_char_arrow ">" "≻"
@@ -33,26 +34,19 @@ function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell,
    echo
    
    # upper level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_has_unicode] "
+   echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_utf8] "
    echo -n $__prompt_timeless_host
    echo -n " "
 
    # display the CWD
    echo -n "$__prompt_cwd"
+   echo -n "$__prompt_dir_stack"
 
    echo
 
    # lower level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl3[$__prompt_has_unicode] "
-
-   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_has_unicode] "
-
-   set -l arrow
-   if test -w $PWD
-      set arrow $__prompt_char_arrow[$__prompt_has_unicode]
-   else
-      set arrow $__prompt_char_arrow_nowrite[$__prompt_has_unicode]
-   end
+   echo -n "$__prompt_colour_block$__prompt_char_blockl3[$__prompt_utf8] "
+   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_utf8] "
 
    # print last command's status
    if not test $last_status -eq 0
@@ -61,10 +55,10 @@ function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell,
 
    # print the prompt arrow
    if test -e "/home/pconley/temp/fish-reload"
-      echo -n "$__prompt_colour_status$arrow $__prompt_colour_normal"
+      echo -n "$__prompt_colour_status$__prompt_arrow $__prompt_colour_normal"
       rm "/home/pconley/temp/fish-reload"
    else
-      echo -n "$__prompt_colour_normal$arrow $__prompt_colour_normal"
+      echo -n "$__prompt_colour_normal$__prompt_arrow $__prompt_colour_normal"
    end
 
 end
@@ -86,14 +80,14 @@ function __prompt_set_timeless_host --description "Set the host area of the prom
    if test $os = "Linux"
       set -l os (cat /etc/issue)
       if test (echo $os | grep "Ubuntu")
-         echo -n "$__prompt_char_ubuntu[$__prompt_has_unicode]"
-         set len (math $len+(expr length $__prompt_char_ubuntu[$__prompt_has_unicode]))
+         echo -n "$__prompt_char_ubuntu[$__prompt_utf8]"
+         set len (math $len+(expr length $__prompt_char_ubuntu[$__prompt_utf8]))
       end
-      echo -n "$__prompt_char_linux[$__prompt_has_unicode]"
-      set len (math $len+(expr length $__prompt_char_linux[$__prompt_has_unicode]))
+      echo -n "$__prompt_char_linux[$__prompt_utf8]"
+      set len (math $len+(expr length $__prompt_char_linux[$__prompt_utf8]))
    else if test $os = "Darwin"
-      echo -n "$__prompt_char_mac[$__prompt_has_unicode]"
-      set len (math $len+(expr length $__prompt_char_mac[$__prompt_has_unicode]))
+      echo -n "$__prompt_char_mac[$__prompt_utf8]"
+      set len (math $len+(expr length $__prompt_char_mac[$__prompt_utf8]))
    end
 
    set -g __prompt_cwd_prefix_len $len
@@ -101,12 +95,12 @@ function __prompt_set_timeless_host --description "Set the host area of the prom
 end
 
 function prompt_unicode_disable
-   set -g __prompt_has_unicode 1
+   set -g __prompt_utf8 1
    __prompt_reset
 end
 
 function prompt_unicode_enable
-   set -g __prompt_has_unicode 2
+   set -g __prompt_utf8 2
    __prompt_reset
 end
 

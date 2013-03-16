@@ -6,7 +6,7 @@ set -g __prompt_colour_date (set_color -o yellow)
 set -g __prompt_colour_normal (set_color normal)
 set -g __prompt_colour_status (set_color red)
 
-set -g __prompt_has_unicode 2
+set -g __prompt_utf8 2
 set -g __prompt_char_blockl1 "|" "⎧" # ⎛⎡⎧ ⌠
 set -g __prompt_char_blockl3 "|" "⎩" # ⎝⎣⎩ ⌡
 set -g __prompt_char_blockr1 "|" "⎫" # ⎞⎤⎫
@@ -29,9 +29,9 @@ function prompt_block --description 'Two-line prompt with time, host, SHLVL, she
    echo
    
    # upper level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_has_unicode] "
+   echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_utf8] "
    echo -n "$__prompt_colour_date"(date "+%d %b at %H:%M")"$__prompt_colour_normal"
-   echo -n "$__prompt_colour_block $__prompt_char_blockr1[$__prompt_has_unicode] "
+   echo -n "$__prompt_colour_block $__prompt_char_blockr1[$__prompt_utf8] "
 
    # display the CWD
    echo -n "$__prompt_cwd"
@@ -39,9 +39,9 @@ function prompt_block --description 'Two-line prompt with time, host, SHLVL, she
    echo
 
    # lower level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl3[$__prompt_has_unicode] "
+   echo -n "$__prompt_colour_block$__prompt_char_blockl3[$__prompt_utf8] "
    echo -n $__prompt_block_host
-   echo -n "$__prompt_colour_block $__prompt_char_blockr2[$__prompt_has_unicode]"
+   echo -n "$__prompt_colour_block $__prompt_char_blockr2[$__prompt_utf8]"
 
    # print status
    if not test $last_status -eq 0
@@ -49,10 +49,10 @@ function prompt_block --description 'Two-line prompt with time, host, SHLVL, she
    end
 
    if test -e "/home/pconley/temp/fish-reload"
-      echo -n "$__prompt_colour_status $__prompt_char_arrow[$__prompt_has_unicode] $__prompt_colour_normal"
+      echo -n "$__prompt_colour_status $__prompt_char_arrow[$__prompt_utf8] $__prompt_colour_normal"
       rm "/home/pconley/temp/fish-reload"
 else
-      echo -n "$__prompt_colour_normal $__prompt_char_arrow[$__prompt_has_unicode] $__prompt_colour_normal"
+      echo -n "$__prompt_colour_normal $__prompt_char_arrow[$__prompt_utf8] $__prompt_colour_normal"
    end
 
 end
@@ -87,16 +87,16 @@ function __prompt_set_block_host --description "Set the host area of the prompt"
    end
 
    # TODO: use 'fish' as the ASCII shell ID. Account for that in the length
-   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_has_unicode]"
+   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_utf8]"
 end
 
 function prompt_unicode_disable
-   set -g __prompt_has_unicode 1
+   set -g __prompt_utf8 1
    __prompt_reset
 end
 
 function prompt_unicode_enable
-   set -g __prompt_has_unicode 2
+   set -g __prompt_utf8 2
    __prompt_reset
 end
 

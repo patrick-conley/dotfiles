@@ -25,31 +25,31 @@
 #     set -l git_status (git status --short --branch ^/dev/null | sort -u)
 # but probably not essential
 
-set -gx __prompt_colour_vcs_toplevel (set_color magenta)
-set -gx __prompt_colour_vcs_path (set_color green)
-set -gx __prompt_colour_vcs_prefix (set_color yellow)
-set -gx __prompt_colour_vcs_clean (set_color green)
-set -gx __prompt_colour_vcs_dirty (set_color red)
-set -gx __prompt_colour_vcs_normal (set_color normal)
+set -g __prompt_colour_vcs_toplevel (set_color magenta)
+set -g __prompt_colour_vcs_path (set_color green)
+set -g __prompt_colour_vcs_prefix (set_color yellow)
+set -g __prompt_colour_vcs_clean (set_color green)
+set -g __prompt_colour_vcs_dirty (set_color red)
+set -g __prompt_colour_vcs_normal (set_color normal)
 
  # set -gx __prompt_colour_vcs_added (set_color green)
  # set -gx __prompt_colour_vcs_modified (set_color blue)
  # set -gx __prompt_colour_vcs_renamed (set_color magenta)
  # set -gx __prompt_colour_vcs_copied (set_color magenta)
  # set -gx __prompt_colour_vcs_deleted (set_color red)
-set -gx __prompt_colour_vcs_untracked (set_color yellow)
-set -gx __prompt_colour_vcs_unmerged (set_color red)
+set -g __prompt_colour_vcs_untracked (set_color yellow)
+set -g __prompt_colour_vcs_unmerged (set_color red)
 
  # set -gx __prompt_vcs_status_added '✚'
  # set -gx __prompt_vcs_status_modified '*'
  # set -gx __prompt_vcs_status_renamed '➜'
  # set -gx __prompt_vcs_status_copied '⇒'
  # set -gx __prompt_vcs_status_deleted '✖'
-set -gx __prompt_vcs_status_untracked '?'
-set -gx __prompt_vcs_status_unmerged '!'
-set -gx __prompt_vcs_status_ahead '+'
+set -g __prompt_vcs_status_untracked '?'
+set -g __prompt_vcs_status_unmerged '!'
+set -g __prompt_vcs_status_ahead "+" "↑"
 
-set -gx __prompt_char_git "git" "±"
+set -g __prompt_char_git "git" "±"
 
 touch /home/pconley/temp/fish-reload
 
@@ -97,10 +97,12 @@ function __pconley_git_prompt --description 'Write out the git prompt'
       echo -n "/$path_tail"
    end
    echo -n "$__prompt_colour_block$__prompt_char_pwdr"
+   set -l stack (__prompt_get_dirs)
+   echo -n "$__prompt_colour_normal$stack"
 
    # print the repo ID
    set_color normal
-   echo -n " $__prompt_char_git[$__prompt_has_unicode] " 
+   echo -n " $__prompt_char_git[$__prompt_utf8] " 
 
    #
    # Test whether the repo is clean
@@ -131,7 +133,7 @@ function __pconley_git_prompt --description 'Write out the git prompt'
       # notify if local is ahead of origin
       set_color normal
       if test $ahead
-         echo -n $__prompt_vcs_status_ahead
+         echo -n $__prompt_vcs_status_ahead[$__prompt_utf8]
       end
       return
    end
@@ -170,12 +172,6 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    # branch name
    echo -n $path[(count $path)]
 
-   # local ahead of origin
-   if test $ahead
-      set_color normal
-      echo -n $__prompt_vcs_status_ahead
-   end
-
    # repo status
    for i in $status_order
       if contains $i in $gs
@@ -185,6 +181,12 @@ function __pconley_git_prompt --description 'Write out the git prompt'
         echo -n $$color_name
         echo -n $$status_name
       end
+   end
+
+   # local ahead of origin
+   if test $ahead
+      set_color normal
+      echo -n $__prompt_vcs_status_ahead[$__prompt_utf8]
    end
 
    set_color normal
