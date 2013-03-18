@@ -48,14 +48,54 @@ set -g __prompt_colour_vcs_unmerged (set_color red)
 set -g __prompt_vcs_status_untracked '?'
 set -g __prompt_vcs_status_unmerged '!'
 set -g __prompt_vcs_status_ahead "+" "↑"
+set -g __prompt_vcs_status_behind "-" "↓"
 
 set -g __prompt_char_git "git" "±"
 
 touch /home/pconley/temp/fish-reload
 
-function __pconley_git_prompt --description 'Write out the git prompt'
+function __pconley_git_prompt --description 'Redraw prompt if git status changed'
+   # Arguments:
+   # - --force: ignore last status
+   # - (git status --short --branch)
+
+   set -l git_status
+   set -l force ""
+   for i in (seq (count $argv))
+      if test $argv[$i] = "--force"
+         set force "--force"
+      else
+         set git_status $argv[$i]
+      end
+   end
+
+   if test (count $git_status) -eq 0
+      set git_status (git status --short --branch ^/dev/null | sort -u)
+   end
+
+   # Check whether status matches saved value and redraw if appropriate
+   if test $force -o "$git_status" != "$__prompt_vcs_last_stat"
+      set -g __prompt_cwd (__prompt_set_git $git_status)
+      set -g __prompt_vcs_last_stat "$git_status"
+   end
+
+   # Ensure the references to origin are up to date
+   __prompt_git_refs_update
+
+end
+
+function __prompt_set_git --description 'Write out the git prompt'
 
    set -l status_order untracked unmerged
+
+   # Arguments: (repo status)
+   set -l index ""
+   if test (count $argv) -eq 0
+      set index (git status --short --branch ^/dev/null | sort -u)
+      set -g __prompt_vcs_last_stat "$index"
+   else
+      set index $argv
+   end
 
    # path to the root, path within the repo, name of the branch
    set -l path (git rev-parse --show-toplevel --show-prefix --abbrev-ref HEAD ^/dev/null)
@@ -79,26 +119,25 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    set -l path_head (echo $path[1] | sed 's/[^/]*$//') # truncate the root
    set path_head (echo $path_head | sed -e "s-^$HOME-~-" -e 's-\([^/]\{1,4\}\)[^/]*/-\1/-g')
 
+   # repo root
+   set -l path_toplevel (echo $path[1] | sed "s/^.*\///")
+
    echo -n "$__prompt_colour_block$__prompt_char_pwdl"
    echo -n $__prompt_colour_vcs_path
    echo -n $path_head
-
-   # repo root
-   set -l path_toplevel (echo $path[1] | sed "s/^.*\///")
 
    echo -n $__prompt_colour_vcs_toplevel
    echo -n $path_toplevel
 
    # path in the repo
    if test (count $path) -eq 3
-      set -l path_tail (echo $path[2] | sed 's/\/$//')
-
-      echo -n $__prompt_colour_vcs_prefix
-      echo -n "/$path_tail"
+      echo -n "$__prompt_colour_vcs_prefix/"
+      echo -n $path[2] | sed 's/\/$//'
    end
+
    echo -n "$__prompt_colour_block$__prompt_char_pwdr"
-   set -l stack (__prompt_get_dirs)
-   echo -n "$__prompt_colour_normal$stack"
+   echo -n "$__prompt_colour_normal"
+   __prompt_get_dirs
 
    # print the repo ID
    set_color normal
@@ -108,21 +147,15 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    # Test whether the repo is clean
    #
 
-   # get the repo's status
-   # It may have been passed to this function by check_pwd
-   set -l index ""
+
+   # check whether local is ahead of or behind
    set -l ahead ""
-
-   if test (count $argv) -eq 0
-      set index (git status --short --branch ^/dev/null | sort -u)
-      set -g __prompt_vcs_last_stat "$index"
-   else
-      set index $argv
-   end
-
-   # check whether local is ahead of origin
-   if test (echo $index | grep "^## .* \[ahead [0-9]*\]")
+   set -l behind ""
+   if test (echo $index | grep "## .* \[ahead [0-9]*\]")
       set ahead 1
+   end
+   if test (echo $index | grep "## .* \[behind [0-9]*\]")
+      set behind 1
    end
 
    # a clean repo will only have set the branch name
@@ -132,6 +165,9 @@ function __pconley_git_prompt --description 'Write out the git prompt'
 
       # notify if local is ahead of origin
       set_color normal
+      if test $behind
+         echo -n $__prompt_vcs_status_behind[$__prompt_utf8]
+      end
       if test $ahead
          echo -n $__prompt_vcs_status_ahead[$__prompt_utf8]
       end
@@ -184,10 +220,37 @@ function __pconley_git_prompt --description 'Write out the git prompt'
    end
 
    # local ahead of origin
+   set_color normal
+   if test $behind
+      echo -n $__prompt_vcs_status_behind[$__prompt_utf8]
+   end
    if test $ahead
-      set_color normal
       echo -n $__prompt_vcs_status_ahead[$__prompt_utf8]
    end
 
    set_color normal
+end
+
+function __prompt_git_refs_update --description 'Update the remote refs'
+   # Arguments: (path to the repo root)
+
+   set -l path
+   if test (count $argv) -eq 0
+      set path (git rev-parse --show-toplevel ^/dev/null)
+   else
+      set path $argv
+   end
+
+   set -l timefile "$path/.git/refs/time"
+
+   if test ! -f $timefile
+      touch $timefile
+   end
+
+   set -l last_update (stat -c "%Y" $timefile)
+
+   if test $last_update -lt (date --date="$__prompt_vcs_update_time minutes ago" "+%s")
+      touch $timefile
+      git remote update ^/dev/null &
+   end
 end

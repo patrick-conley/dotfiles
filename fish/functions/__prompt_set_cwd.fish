@@ -21,8 +21,7 @@ function __prompt_set_cwd --on-variable PWD --description "Event handler: reset 
    set -l temp_status (git status --short --branch ^/dev/null)
    if test (count $temp_status) -gt 0
       set -g __prompt_vcs_type "git"
-      set -g __prompt_cwd (__pconley_git_prompt $temp_status)
-      set -g __prompt_vcs_last_stat "$temp_status"
+      __pconley_git_prompt --force $temp_status
 
    # mercurial
    else if not test -z (hg root ^/dev/null)

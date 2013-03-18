@@ -4,6 +4,8 @@ set -g __prompt_colour_host (set_color -o red)
 set -g __prompt_colour_normal (set_color normal)
 set -g __prompt_colour_status (set_color red)
 
+set -g __prompt_vcs_update_time 5
+
 set -g __prompt_char_shlvl "+" 
 set -g __prompt_char_pwdl "(" 
 set -g __prompt_char_pwdr ")" 
