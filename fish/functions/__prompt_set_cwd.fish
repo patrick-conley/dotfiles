@@ -13,7 +13,7 @@ set -g __prompt_colour_pwd (set_color green)
 
 touch /home/pconley/temp/fish-reload
 
-# reset everything 
+# reset everything
 # Set __prompt_cwd and __prompt_arrow
 function __prompt_set_cwd --on-variable PWD --description "Event handler: reset the cwd"
 
@@ -38,7 +38,7 @@ function __prompt_set_cwd --on-variable PWD --description "Event handler: reset 
       set -g __prompt_cwd "$__prompt_colour_block$__prompt_char_pwdl"
       set -g __prompt_cwd "$__prompt_cwd$__prompt_colour_pwd$cwd"
       set -g __prompt_cwd "$__prompt_cwd$__prompt_colour_block$__prompt_char_pwdr"
-      set -l stack (__prompt_get_dirs)
+      set -l stack (__prompt_print_dirstack)
       set -g __prompt_cwd "$__prompt_cwd$__prompt_colour_normal$stack"
    end
 
@@ -51,7 +51,7 @@ function __prompt_set_cwd --on-variable PWD --description "Event handler: reset 
 
 end
 
-function __prompt_get_dirs --description "Check whether pushd has been used"
+function __prompt_print_dirstack --description "Check whether pushd has been used"
 
    # Check the depth of the directory stack
    if test (count (echo (dirs) | sed -e "s/  /\n/g" )) -gt 2
@@ -120,5 +120,5 @@ function __prompt_cwd_trunc --description "Limit the length of the CWD string"
 
       echo -n $cwd_tokens[(count $cwd_tokens)]
    end
-   
+
 end

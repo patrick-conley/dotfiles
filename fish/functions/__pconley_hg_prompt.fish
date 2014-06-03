@@ -58,7 +58,7 @@ function __pconley_hg_prompt --description "Write out the mercurial prompt"
       set -l escaped_root ( echo $root | sed -e 's-/-\\\\/-g' )
       echo -n ( echo $PWD | sed "s/$escaped_root//" )
    end
-   set -l stack (__prompt_get_dirs)
+   set -l stack (__prompt_print_dirstack)
    echo -n "$__prompt_colour_normal$stack"
 
    # print the repo ID

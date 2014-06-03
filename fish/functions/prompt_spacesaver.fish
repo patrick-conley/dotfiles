@@ -37,7 +37,7 @@ function prompt_spacesaver --description 'Three-line prompt with time, shell, st
    __prompt_check_cwd
 
    echo
-   
+
    # upper level
    echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_utf8] "
    echo -n "$__prompt_colour_date"(date "+%d %b at %H:%M")"$__prompt_colour_normal"

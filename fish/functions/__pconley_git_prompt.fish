@@ -21,7 +21,7 @@
 # string. If checking that the status is non-null, remember that it's an
 # array.
 #
-# It is convenient (and possibly quicker) to use 
+# It is convenient (and possibly quicker) to use
 #     set -l git_status (git status --short --branch ^/dev/null | sort -u)
 # but probably not essential
 
@@ -31,6 +31,7 @@ set -g __prompt_colour_vcs_prefix (set_color yellow)
 set -g __prompt_colour_vcs_clean (set_color green)
 set -g __prompt_colour_vcs_dirty (set_color red)
 set -g __prompt_colour_vcs_normal (set_color normal)
+set -g __prompt_colour_vcs_detatched (set_color magenta)
 
  # set -gx __prompt_colour_vcs_added (set_color green)
  # set -gx __prompt_colour_vcs_modified (set_color blue)
@@ -105,22 +106,31 @@ function __prompt_set_git --description 'Write out the git prompt'
       return
    end
 
-   # if the repo has never been committed, there is no branch name to return
+   # if the repo has never been committed or we've checked out an old commit,
+   # there is no branch name to return
    if test $path[(count $path)] = "HEAD"
-      set path[(count $path)] "initial commit"
+      set path[(count $path)] "$__prompt_colour_vcs_detatched""detatched head"
    end
 
    #
    # Print the path to CWD
    #
 
+   set -l truncate 's-\([^/]\{1,4\}\)[^/]*/-\1/-g'
+
    # path to the repo (everything before the repo root)
    # based on prompt_pwd
    set -l path_head (echo $path[1] | sed 's/[^/]*$//') # truncate the root
-   set path_head (echo $path_head | sed -e "s-^$HOME-~-" -e 's-\([^/]\{1,4\}\)[^/]*/-\1/-g')
+   set path_head (echo $path_head | sed -e "s-^$HOME-~-" -e $truncate)
 
    # repo root
    set -l path_toplevel (echo $path[1] | sed "s/^.*\///")
+
+   # path in the repo
+   set -l path_tail ""
+   if test (count $path) -eq 3
+      set path_tail (echo -n $path[2] | sed -e 's/\/$//' -e $truncate)
+   end
 
    echo -n "$__prompt_colour_block$__prompt_char_pwdl"
    echo -n $__prompt_colour_vcs_path
@@ -129,19 +139,19 @@ function __prompt_set_git --description 'Write out the git prompt'
    echo -n $__prompt_colour_vcs_toplevel
    echo -n $path_toplevel
 
-   # path in the repo
-   if test (count $path) -eq 3
-      echo -n "$__prompt_colour_vcs_prefix/"
-      echo -n $path[2] | sed 's/\/$//'
-   end
+   echo -n "$__prompt_colour_vcs_prefix/"
+   echo -n $path_tail
 
    echo -n "$__prompt_colour_block$__prompt_char_pwdr"
    echo -n "$__prompt_colour_normal"
-   __prompt_get_dirs
+
+   if test -z "$__prompt_char_pushd"
+      __prompt_print_dirstack
+   end
 
    # print the repo ID
    set_color normal
-   echo -n " $__prompt_char_git[$__prompt_utf8] " 
+   echo -n " $__prompt_char_git[$__prompt_utf8] "
 
    #
    # Test whether the repo is clean

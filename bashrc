@@ -3,6 +3,9 @@
 # Patrick Conley pconley@uvic.ca
 # Last modified: 2012 Dec 10
 
+# colourscheme (&tmux) require explicit 256-colour terminal to work
+export TERM=xterm-256color
+
 # Set the path
 PATH=$PATH:$HOME/bin
 
@@ -63,7 +66,7 @@ function cd_writepath()
    cd "$@"
    writewd
 }
-alias cd='cd_writepath'
+# alias cd='cd_writepath'
 
 # ssh with default servers {{{1
 if [[ -n "$( alias | grep 'ssh' )" ]]; then unalias ssh; fi

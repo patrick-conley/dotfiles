@@ -88,7 +88,7 @@ greppdf() # run grep on text in pdf files{{{2
    done
 }
 
-play() # play a music file from the terminal
+play() # play a music file from the terminal {{{2
 {
    file=$( readlink -f $1 )
 
@@ -106,7 +106,12 @@ play() # play a music file from the terminal
 
 # Aliases {{{1
 
-alias ls='ls --color=auto'
+if [[ $(uname) == "Darwin" ]]; then
+   alias ls='ls -FG'
+else
+   alias ls='ls --color=auto'
+fi
+
 alias grep='grep --color=auto'
 alias la='ls -a'
 alias ll='ls -lh'

@@ -4,11 +4,12 @@ set -g __prompt_colour_host (set_color -o red)
 set -g __prompt_colour_normal (set_color normal)
 set -g __prompt_colour_status (set_color red)
 
+# Time since origin has last been checked
 set -g __prompt_vcs_update_time 5
 
-set -g __prompt_char_shlvl "+" 
-set -g __prompt_char_pwdl "(" 
-set -g __prompt_char_pwdr ")" 
+set -g __prompt_char_shlvl "" # "+"
+set -g __prompt_char_pwdl "("
+set -g __prompt_char_pwdr ")"
 set -g __prompt_char_pushd "+" "+"
 
 set -g __prompt_utf8 2
@@ -17,9 +18,9 @@ set -g __prompt_char_blockl3 "|" "⎩" # ⎝⎣⎩ ⌡
 set -g __prompt_char_arrow ">" "≻"
 set -g __prompt_char_arrow_nowrite ">" "⊁"
 set -g __prompt_char_shell "fish" "♒"
-set -g __prompt_char_linux " (linux)" "" # Tux (fonts-linuxlibertine)
-set -g __prompt_char_mac " (os x)" "⌘ "
-set -g __prompt_char_ubuntu "" "" # Ubuntu logo (ubuntu font)
+set -g __prompt_char_linux " (linux)" "" # "" # Tux (fonts-linuxlibertine - installed with LaTeX)
+set -g __prompt_char_mac " (os x)" "" # "⌘ "
+set -g __prompt_char_ubuntu "" "" # "" # Ubuntu logo (ubuntu font)
 
 touch /home/pconley/temp/fish-reload
 
@@ -34,7 +35,7 @@ function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell,
    __prompt_check_cwd
 
    echo
-   
+
    # upper level
    echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_utf8] "
    echo -n $__prompt_timeless_host
