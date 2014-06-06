@@ -1,20 +1,54 @@
+set -g __prompt_colour_normal (set_color normal)
 set -g __prompt_colour_block (set_color cyan)
 set -g __prompt_colour_pwd (set_color green)
 set -g __prompt_colour_host (set_color -o red)
-set -g __prompt_colour_normal (set_color normal)
 set -g __prompt_colour_status (set_color red)
+set -g __prompt_colour_shlvl (set_color normal)
+
+set -g __prompt_colour_vcs_toplevel (set_color magenta)
+set -g __prompt_colour_vcs_path (set_color green)
+set -g __prompt_colour_vcs_prefix (set_color yellow)
+set -g __prompt_colour_vcs_clean (set_color green)
+set -g __prompt_colour_vcs_dirty (set_color red)
+set -g __prompt_colour_vcs_normal (set_color normal)
+set -g __prompt_colour_vcs_detatched (set_color magenta)
+
+ # set -gx __prompt_colour_vcs_added (set_color green)
+ # set -gx __prompt_colour_vcs_modified (set_color blue)
+ # set -gx __prompt_colour_vcs_renamed (set_color magenta)
+ # set -gx __prompt_colour_vcs_copied (set_color magenta)
+ # set -gx __prompt_colour_vcs_deleted (set_color red)
+set -g __prompt_colour_vcs_untracked (set_color yellow)
+set -g __prompt_colour_vcs_unmerged (set_color red)
+
+ # set -gx __prompt_vcs_status_added '✚'
+ # set -gx __prompt_vcs_status_modified '*'
+ # set -gx __prompt_vcs_status_renamed '➜'
+ # set -gx __prompt_vcs_status_copied '⇒'
+ # set -gx __prompt_vcs_status_deleted '✖'
+set -g __prompt_vcs_status_untracked '?'
+set -g __prompt_vcs_status_unmerged '!'
+set -g __prompt_vcs_status_ahead "+" "↑"
+set -g __prompt_vcs_status_behind "-" "↓"
+
+set -g __prompt_char_git "git" "±"
+set -g __prompt_char_hg "hg" "☿"
 
 # Time since origin has last been checked
 set -g __prompt_vcs_update_time 5
 
 set -g __prompt_char_shlvl "" # "+"
-set -g __prompt_char_pwdl "("
-set -g __prompt_char_pwdr ")"
+set -g __prompt_char_pwd_l "("
+set -g __prompt_char_pwd_r ")"
 set -g __prompt_char_pushd "+" "+"
 
-set -g __prompt_utf8 2
-set -g __prompt_char_blockl1 "|" "⎧" # ⎛⎡⎧ ⌠
-set -g __prompt_char_blockl3 "|" "⎩" # ⎝⎣⎩ ⌡
+set -g __prompt_use_utf8 2
+set -g __prompt_char_block_l1 "|" "⎧" # ⎛⎡⎧ ⌠
+set -g __prompt_char_block_l2 "|" "⎪" # ⎛⎡⎧ ⌠
+set -g __prompt_char_block_l3 "|" "⎩" # ⎝⎣⎩ ⌡
+set -g __prompt_char_block_r1 "|" "⎫" # ⎛⎡⎧ ⌠
+set -g __prompt_char_block_r2 "|" "⎪" # ⎛⎡⎧ ⌠
+set -g __prompt_char_block_r3 "|" "⎭" # ⎝⎣⎩ ⌡
 set -g __prompt_char_arrow ">" "≻"
 set -g __prompt_char_arrow_nowrite ">" "⊁"
 set -g __prompt_char_shell "fish" "♒"
@@ -22,88 +56,39 @@ set -g __prompt_char_linux " (linux)" "" # "" # Tux (fonts-linuxlibertine - i
 set -g __prompt_char_mac " (os x)" "" # "⌘ "
 set -g __prompt_char_ubuntu "" "" # "" # Ubuntu logo (ubuntu font)
 
-touch /home/pconley/temp/fish-reload
+touch $__prompt_reload_file
 
 function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell, status, cwd, and vcs info'
    set -l last_status $argv[1]
 
-   # set some variables
-   if not set -q __prompt_timeless_host
-      set -g __prompt_timeless_host (__prompt_set_timeless_host)
-   end
-
-   __prompt_check_cwd
-
    echo
 
    # upper level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_utf8] "
-   echo -n $__prompt_timeless_host
-   echo -n " "
-
-   # display the CWD
-   echo -n "$__prompt_cwd"
-   echo -n "$__prompt_dir_stack"
+   echo -n -s \
+      (__prompt_block l1) " " \
+      (__prompt_host) " " \
+      (__prompt_dir_stack) (__prompt_cwd) " " \
+      (__prompt_vcs) \
 
    echo
 
    # lower level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl3[$__prompt_utf8] "
-   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_utf8] "
-
-   # print last command's status
-   if not test $last_status -eq 0
-      echo -n "$__prompt_colour_normal($__prompt_colour_status$last_status$__prompt_colour_normal) "
-   end
-
-   # print the prompt arrow
-   if test -e "/home/pconley/temp/fish-reload"
-      echo -n "$__prompt_colour_status$__prompt_arrow $__prompt_colour_normal"
-      rm "/home/pconley/temp/fish-reload"
-   else
-      echo -n "$__prompt_colour_normal$__prompt_arrow $__prompt_colour_normal"
-   end
-
-end
-
-function __prompt_set_timeless_host --description "Set the host area of the prompt"
-
-   # set & draw the shell depth
-   if test $SHLVL -gt 1
-      echo -n "$__prompt_colour_normal$__prompt_char_shlvl"
-      set len (math $len+1)
-   end
-
-   # set & draw the hostname
-   set -l p_host (hostname)
-   set -l len (expr length $p_host)
-   echo -n "$__prompt_colour_host$p_host$__prompt_colour_normal"
-
-   set -l os (uname)
-   if test $os = "Linux"
-      set -l os (cat /etc/issue)
-      if test (echo $os | grep "Ubuntu")
-         echo -n "$__prompt_char_ubuntu[$__prompt_utf8]"
-         set len (math $len+(expr length $__prompt_char_ubuntu[$__prompt_utf8]))
-      end
-      echo -n "$__prompt_char_linux[$__prompt_utf8]"
-      set len (math $len+(expr length $__prompt_char_linux[$__prompt_utf8]))
-   else if test $os = "Darwin"
-      echo -n "$__prompt_char_mac[$__prompt_utf8]"
-      set len (math $len+(expr length $__prompt_char_mac[$__prompt_utf8]))
-   end
-
-   set -g __prompt_cwd_prefix_len $len
+   echo -n \
+      (__prompt_block l3) \
+      (__prompt_shell) \
+      (__prompt_status $last_status) \
+      (__prompt_arrow) \
+      ""
 
 end
 
 function prompt_unicode_disable
-   set -g __prompt_utf8 1
+   set -g __prompt_use_utf8 1
    __prompt_reset
 end
 
 function prompt_unicode_enable
-   set -g __prompt_utf8 2
+   set -g __prompt_use_utf8 2
    __prompt_reset
 end
 

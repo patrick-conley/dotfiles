@@ -1,6 +1,8 @@
+set -g __prompt_reload_file "/tmp/fish-reload"
+
 set -g prompt_name 'timeless'
 
-touch /home/pconley/temp/fish-reload
+touch $__prompt_reload_file
 
 function fish_prompt --description 'Write out the prompt'
    set -l last_status $status
@@ -17,7 +19,7 @@ end
 function set_prompt --description 'Set the prompt type'
    if test (count $argv) -eq 0
       echo "Prompts available:"
-      for name in (ls $HOME/Documents/projects/2012/dotfiles/fish/functions/prompt*.fish)
+      for name in (ls $HOME/.config/fish/functions/prompt*.fish)
          echo
          set name (echo $name | sed 's/\.fish$//')
          set name (echo $name | sed "s-^.*/--")
