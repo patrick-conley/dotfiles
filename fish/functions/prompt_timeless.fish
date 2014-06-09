@@ -35,7 +35,7 @@ set -g __prompt_char_git "git" "±"
 set -g __prompt_char_hg "hg" "☿"
 
 # Time since origin has last been checked
-set -g __prompt_vcs_update_time 5
+set -g __prompt_vcs_update_interval 15
 
 set -g __prompt_char_shlvl "" # "+"
 set -g __prompt_char_pwd_l "("

@@ -12,9 +12,6 @@ end
 
 function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when the directory changes'
 
-   set -l vcs_root # ensure this is defined
-   set -e __prompt_saved_vcs_type
-
    # Check if we're in a VCS repository
    # git
    if set vcs_root (git rev-parse --show-toplevel --show-prefix ^/dev/null)
@@ -26,6 +23,8 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
 
       # Add the path within the repo (git's "prefix")
       set vcs_root[2] (echo $PWD | sed "s-$vcs_root[1]--")
+   else
+      set -e __prompt_saved_vcs_type
    end
 
    if not set -q __prompt_saved_vcs_type
@@ -33,7 +32,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       # TODO: truncate the directory names if the prompt is long
       set -g __prompt_saved_cwd \
          $__prompt_colour_block $__prompt_char_pwd_l \
-         $__prompt_colour_pwd $PWD \
+         $__prompt_colour_pwd (echo $PWD | sed -e "s-^$HOME-~-") \
          $__prompt_colour_block $__prompt_char_pwd_r \
          $__prompt_colour_normal
 

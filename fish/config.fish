@@ -1,10 +1,6 @@
-touch /tmp/fish-reload
-
 if status --is-interactive
-   # Prompts call __prompt_set_cwd only when dir changes: must be set explicitly
-   # Draw the prompt first to set global variables
-   fish_prompt > /dev/null
-   set -g prompt_cwd (__prompt_set_cwd)
+   fish_prompt >/dev/null
+   __prompt_cwd >/dev/null
 end
 
 if status --is-login
