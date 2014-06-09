@@ -12,13 +12,4 @@ function __prompt_update_git_refs --description 'Update the remote refs'
       git remote update ^&1 >/dev/null &
    end
 
-   #if not set -q __prompt_saved_vcs_next_update
-      #set __prompt_saved_vcs_next_update (date --date="$__prompt_vcs_update_interval minutes" "+%s")
-   #end
-
-   #if test (date "+%s") -lt $__prompt_saved_vcs_next_update
-      ##git remote update ^&1 >/dev/null &
-      #set __prompt_saved_vcs_next_update (date --date="$__prompt_vcs_update_interval minutes" "+%s")
-   #end
-
 end

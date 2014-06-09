@@ -12,6 +12,10 @@ end
 
 function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when the directory changes'
 
+   # Delimiter characters in variables embedded in sed expressions must be
+   # escaped
+   set -l escaped_home (echo $HOME | sed 's-/-\\\\/-g')
+
    # Check if we're in a VCS repository
    # git
    if set vcs_root (git rev-parse --show-toplevel --show-prefix ^/dev/null)
@@ -22,7 +26,8 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       set -g __prompt_saved_vcs_type "hg"
 
       # Add the path within the repo (git's "prefix")
-      set vcs_root[2] (echo $PWD | sed "s-$vcs_root[1]--")
+      set escaped_root (echo $vcs_root | sed 's-/-\\\\/-g')
+      set vcs_root[2] (echo $PWD | sed "s/$escaped_root//")
    else
       set -e __prompt_saved_vcs_type
    end
@@ -32,7 +37,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       # TODO: truncate the directory names if the prompt is long
       set -g __prompt_saved_cwd \
          $__prompt_colour_block $__prompt_char_pwd_l \
-         $__prompt_colour_pwd (echo $PWD | sed -e "s-^$HOME-~-") \
+         $__prompt_colour_pwd (echo $PWD | sed "s/^$escaped_home/~/") \
          $__prompt_colour_block $__prompt_char_pwd_r \
          $__prompt_colour_normal
 
@@ -43,15 +48,15 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       # characters
 
       set -l head (echo $vcs_root[1] | \
-            sed -e "s-^$HOME-~-" -e  's/[^/]*$//' -e "s-\([^/]\{1,4\}\)[^/]*/-\1/-g")
+            sed -e "s/^$escaped_home/~/" -e  's/[^/]*$//' -e "s-\([^/]\{1,4\}\)[^/]*/-\1/-g")
       set -l root (echo $vcs_root[1] | sed 's-.*/--')
-      set -l prefix (echo $vcs_root[2] | sed -e 's-^/--' -e 's-/$--')
+      set -l prefix (echo $vcs_root[2] | sed -e 's-^\([^/]\)-/\1-' -e 's-/$--')
 
       set -g __prompt_saved_cwd \
          $__prompt_colour_block $__prompt_char_pwd_l \
          $__prompt_colour_pwd $head \
          $__prompt_colour_vcs_toplevel $root \
-         $__prompt_colour_vcs_prefix "/" $prefix \
+         $__prompt_colour_vcs_prefix $prefix \
          $__prompt_colour_block $__prompt_char_pwd_r \
          $__prompt_colour_normal
 
