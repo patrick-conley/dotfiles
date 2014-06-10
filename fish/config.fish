@@ -1,5 +1,7 @@
 touch /tmp/fish-reload
 
+set TERM xterm-256color
+
 if status --is-interactive
    # Prompts call __prompt_set_cwd only when dir changes: must be set explicitly
    # Draw the prompt first to set global variables
