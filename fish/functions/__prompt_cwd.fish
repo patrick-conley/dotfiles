@@ -21,6 +21,10 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
    if set vcs_root (git rev-parse --show-toplevel --show-prefix ^/dev/null)
       set -g __prompt_saved_vcs_type "git"
 
+      if test (count $vcs_root) -eq 1
+         set vcs_root[2] ""
+      end
+
    # mercurial
    else if set vcs_root (hg root ^/dev/null)
       set -g __prompt_saved_vcs_type "hg"
