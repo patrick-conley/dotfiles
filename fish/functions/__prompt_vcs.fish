@@ -4,7 +4,8 @@ function __prompt_vcs --description 'Draw VCS branch name & status'
 
    switch "$__prompt_saved_vcs_type"
       case "git"
-         set -l vcs_status (git status --short --branch ^/dev/null); or return
+         # TODO: check submodules periodically (print <-)
+         set -l vcs_status (git status --short --branch --ignore-submodules ^/dev/null); or return
 
          if not test "$__prompt_saved_vcs_status" = "$vcs_status"
             __prompt_git $vcs_status
@@ -12,8 +13,6 @@ function __prompt_vcs --description 'Draw VCS branch name & status'
          end
 
          echo -n -s $__prompt_saved_vcs_info
-
-         __prompt_update_git_refs
       case "hg"
          #__prompt_vcs_hg
    end
@@ -90,5 +89,18 @@ function __prompt_git --description 'Draw the git branch'
    end
 
    set -g __prompt_saved_vcs_info $git_prompt
+
+   # Update the remote refs (periodically)
+   set -l timefile (git rev-parse --git-dir)"/refs/last_remote_update"
+
+   if not test -f $timefile
+      touch --date="" $timefile
+   end
+
+   if not test (stat -c "%Y" $timefile ^/dev/null) -ge \
+         (date --date="$__prompt_vcs_update_interval minutes ago" "+%s")
+      touch $timefile
+      git remote update ^&1 >/dev/null &
+   end
 
 end
