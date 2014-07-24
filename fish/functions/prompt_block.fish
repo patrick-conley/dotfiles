@@ -14,7 +14,7 @@ set -g __prompt_char_blockr2 "|" "⎭" # ⎠⎦⎭
 set -g __prompt_char_arrow ">" "≻"
 set -g __prompt_char_shell "fish" "♓"
 
-touch /home/pconley/temp/fish-reload
+touch /tmp/fish-reload
 
 function prompt_block --description 'Two-line prompt with time, host, SHLVL, shell, status, cwd, and vcs info'
    set -l last_status $argv[1]
@@ -48,9 +48,9 @@ function prompt_block --description 'Two-line prompt with time, host, SHLVL, she
       echo -n "$__prompt_colour_normal ($__prompt_colour_status$last_status$__prompt_colour_normal)"
    end
 
-   if test -e "/home/pconley/temp/fish-reload"
+   if test -e "/tmp/fish-reload"
       echo -n "$__prompt_colour_status $__prompt_char_arrow[$__prompt_utf8] $__prompt_colour_normal"
-      rm "/home/pconley/temp/fish-reload"
+      rm "/tmp/fish-reload"
 else
       echo -n "$__prompt_colour_normal $__prompt_char_arrow[$__prompt_utf8] $__prompt_colour_normal"
    end

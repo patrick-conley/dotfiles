@@ -1,0 +1,4 @@
+--langdef=fish
+--langmap=fish:.fish
+--regex-fish=/^\s*function\s*([a-zA-Z0-9_]+).*((--description(\s+|=)|-d\s*)(["'])([^\4]*)\4)?.*$/\1 \6/f,function/
+--regex-fish=/set -g ([a-zA-Z0-9_]+)/\1/g,global/

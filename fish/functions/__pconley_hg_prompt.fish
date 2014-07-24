@@ -23,7 +23,7 @@ set -gx __prompt_vcs_status_unmerged '!'
 
 set -gx __prompt_char_hg "hg" "☿"
 
-touch /home/pconley/temp/fish-reload
+touch /tmp/fish-reload
 
 function __pconley_hg_prompt --description "Write out the mercurial prompt"
 

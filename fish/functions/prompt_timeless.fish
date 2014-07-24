@@ -84,15 +84,10 @@ end
 
 function prompt_unicode_disable
    set -g __prompt_use_utf8 1
-   __prompt_reset
+   __prompt_set_cwd
 end
 
 function prompt_unicode_enable
    set -g __prompt_use_utf8 2
-   __prompt_reset
-end
-
-function __prompt_reset --description "Reset all parts of the prompt"
    __prompt_set_cwd
-   set -g __prompt_timeless_host (__prompt_set_timeless_host)
 end
