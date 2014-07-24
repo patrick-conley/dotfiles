@@ -4,7 +4,8 @@ function __prompt_vcs --description 'Draw VCS branch name & status'
 
    switch "$__prompt_saved_vcs_type"
       case "git"
-         set -l vcs_status (git status --short --branch ^/dev/null); or return
+         # TODO: check submodules periodically (print <-)
+         set -l vcs_status (git status --short --branch --ignore-submodules ^/dev/null); or return
 
          if not test "$__prompt_saved_vcs_status" = "$vcs_status"
             __prompt_git $vcs_status
