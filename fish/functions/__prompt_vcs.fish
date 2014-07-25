@@ -14,10 +14,20 @@ function __prompt_vcs --description 'Draw VCS branch name & status'
 
          echo -n -s $__prompt_saved_vcs_info
 
-         __prompt_update_git_refs
-      case "hg"
-         #__prompt_vcs_hg
-   end
+         set -l gitdir (git rev-parse --git-dir --show-toplevel)
+         set -l timefile $gitdir[1]/refs/last_remote_update
+
+         if test ! -f $timefile -o \
+               (stat -c "%Y" $timefile ^/dev/null) -lt \
+               (date --date="$__prompt_vcs_update_interval minutes ago" "+%s")
+            touch $timefile
+            git remote update ^&1 >/dev/null &
+            ctags --tag-relative --recurse --exclude=$gitdir[1] -f $gitdir[1]/tags $gitdir[2] &
+         end
+
+         case "hg"
+            #__prompt_vcs_hg
+      end
 
 end
 
