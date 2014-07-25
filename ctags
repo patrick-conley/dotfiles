@@ -1,4 +1,12 @@
+--tag-relative
+--recurse
+--exclude=.git
+--exclude=.hg
+
 --langdef=fish
 --langmap=fish:.fish
 --regex-fish=/^\s*function\s*([a-zA-Z0-9_]+).*((--description(\s+|=)|-d\s*)(["'])([^\4]*)\4)?.*$/\1 \6/f,function/
 --regex-fish=/set -g ([a-zA-Z0-9_]+)/\1/g,global/
+
+--regex-make=/^COMMENT: painful regex to match any target but ".PHONY"/\1/X,XXXXX/
+--regex-make=/^(\.PHONY[^:]+|\.PHON(|[^Y:][^:]*)|\.PHO(|[^N:][^:]*)|\.PH(|[^O][^:]*)|\.P(|[^H][^:]*)|\.(|[^P][^:]*)|[^\.:][^:]*):/\1/t,target/

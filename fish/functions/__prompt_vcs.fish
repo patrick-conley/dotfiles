@@ -2,10 +2,12 @@ touch $__prompt_reload_file
 
 function __prompt_vcs --description 'Draw VCS branch name & status'
 
+
    switch "$__prompt_saved_vcs_type"
       case "git"
          # TODO: check submodules periodically (print <-)
          set -l vcs_status (git status --short --branch --ignore-submodules ^/dev/null); or return
+         set -l git_paths (git rev-parse --git-dir --show-toplevel)
 
          if not test "$__prompt_saved_vcs_status" = "$vcs_status"
             __prompt_git $vcs_status
@@ -14,15 +16,16 @@ function __prompt_vcs --description 'Draw VCS branch name & status'
 
          echo -n -s $__prompt_saved_vcs_info
 
-         set -l gitdir (git rev-parse --git-dir --show-toplevel)
-         set -l timefile $gitdir[1]/refs/last_remote_update
+         # Update the remote refs
+         touch --date="$__prompt_vcs_update_interval minutes ago" /tmp/fish_prompt_time 
 
-         if test ! -f $timefile -o \
-               (stat -c "%Y" $timefile ^/dev/null) -lt \
-               (date --date="$__prompt_vcs_update_interval minutes ago" "+%s")
-            touch $timefile
+         if command test -f $git_paths[1]/FETCH_HEAD -a $git_paths[1]/FETCH_HEAD -ot /tmp/fish_prompt_time
             git remote update ^&1 >/dev/null &
-            ctags --tag-relative --recurse --exclude=$gitdir[1] -f $gitdir[1]/tags $gitdir[2] &
+         end
+
+         # Update tags
+         if command test $git_paths[1]/tags -ot /tmp/fish_prompt_time
+            ctags --tag-relative --recurse --exclude=$git_paths[1] -f $git_paths[1]/tags $git_paths[2] &
          end
 
          case "hg"
