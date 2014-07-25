@@ -10,3 +10,5 @@
 
 --regex-make=/^COMMENT: painful regex to match any target but ".PHONY"/\1/X,XXXXX/
 --regex-make=/^(\.PHONY[^:]+|\.PHON(|[^Y:][^:]*)|\.PHO(|[^N:][^:]*)|\.PH(|[^O][^:]*)|\.P(|[^H][^:]*)|\.(|[^P][^:]*)|[^\.:][^:]*):/\1/t,target/
+
+--regex-vim=/syntax (match|region|keyword|cluster) (\w+)/\2/s,syntax/
