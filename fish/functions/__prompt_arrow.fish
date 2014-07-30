@@ -6,7 +6,7 @@ function __prompt_arrow --description 'Draw the prompt arrow'
    # fish reloads its functions. Handy only for debugging prompts
    if test -e $__prompt_reload_file
       echo -n $__prompt_colour_status
-      rm $__prompt_reload_file
+      rm -f $__prompt_reload_file
    end
 
    if test -w $PWD
