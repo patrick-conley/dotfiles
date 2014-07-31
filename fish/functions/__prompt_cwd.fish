@@ -26,7 +26,8 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       end
 
    # mercurial
-   else if set vcs_root (echo -e (hg prompt "{root}\n{root|prefix}"))
+   else if set vcs_root (hg prompt "{root}\n{root|prefix}" ^/dev/null)
+      set vcs_root (echo -e $vcs_root)
       set -g __prompt_saved_vcs_type "hg"
 
       if test (count $vcs_root) -eq 1

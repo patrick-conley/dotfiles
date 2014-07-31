@@ -6,7 +6,7 @@ touch $__prompt_reload_file
 
 function __prompt_hg --description 'Check mercurial statuses'
 
-   set -l vcs_status (echo -e (hg prompt "{root|root}\n{branch}\n{+mod{status|modified}}\n{+new{status|unknown}}\n{+out{outgoing}}\n{+in{incoming}}")); or return
+   set -l vcs_status (echo -e (hg prompt "{root|root}\n{branch}\n{+mod{status|modified}}\n{+new{status|unknown}}\n{+out{outgoing}}\n{+in{incoming}}" ^/dev/null)); or return
    set -l vcs_paths $vcs_status[1]
    set vcs_status $vcs_status[2..-1]
 
