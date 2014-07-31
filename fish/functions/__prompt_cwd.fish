@@ -26,12 +26,12 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       end
 
    # mercurial
-   else if set vcs_root (hg root ^/dev/null)
+   else if set vcs_root (echo -e (hg prompt "{root}\n{root|prefix}"))
       set -g __prompt_saved_vcs_type "hg"
 
-      # Add the path within the repo (git's "prefix")
-      set escaped_root (echo $vcs_root | sed 's-/-\\\\/-g')
-      set vcs_root[2] (echo $PWD | sed "s/$escaped_root//")
+      if test (count $vcs_root) -eq 1
+         set vcs_root[2] ""
+      end
    else
       set -e __prompt_saved_vcs_type
    end
@@ -47,7 +47,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
 
    else
 
-      # The lengthy var substitution below changes "/home/me" => "~", then
+      # The lengthy var substitution below changes "/home/me" to "~", then
       # truncates each directory above the repo root to its first few
       # characters
 

@@ -2,6 +2,9 @@
 --recurse
 --exclude=.git
 --exclude=.hg
+--exclude=*~
+--exclude=*.swp
+--exclude=*.swo
 
 --langdef=fish
 --langmap=fish:.fish
