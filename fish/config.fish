@@ -8,7 +8,3 @@ end
 if status --is-login
    set PATH $HOME/bin $HOME/bin/scripts $PATH
 end
-
-function perlmod
-   h2xs -AX $argv
-end
