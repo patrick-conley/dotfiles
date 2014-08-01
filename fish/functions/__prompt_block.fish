@@ -14,11 +14,11 @@ function __prompt_block --description 'Does nothing: autoloads the file'
       case "l3"
          echo -n $__prompt_char_block_l3[$__prompt_use_utf8]
       case "r1"
-         echo -n $__prompt_char_brock_r1[$__prompt_use_utf8]
+         echo -n $__prompt_char_block_r1[$__prompt_use_utf8]
       case "r2"
-         echo -n $__prompt_char_brock_r2[$__prompt_use_utf8]
+         echo -n $__prompt_char_block_r2[$__prompt_use_utf8]
       case "r3"
-         echo -n $__prompt_char_brock_r3[$__prompt_use_utf8]
+         echo -n $__prompt_char_block_r3[$__prompt_use_utf8]
    end
 
    echo -n $__prompt_colour_normal
