@@ -1,20 +1,4 @@
-set -g __prompt_colour_block (set_color cyan)
-set -g __prompt_colour_pwd (set_color green)
-set -g __prompt_colour_host (set_color -o red)
-set -g __prompt_colour_shlvl (set_color yellow)
-set -g __prompt_colour_date (set_color -o yellow)
-set -g __prompt_colour_normal (set_color normal)
-set -g __prompt_colour_status (set_color red)
-
-set -g __prompt_utf8 2
-set -g __prompt_char_blockl1 "|" "⎧" # ⎛⎡⎧ ⌠
-set -g __prompt_char_blockl3 "|" "⎩" # ⎝⎣⎩ ⌡
-set -g __prompt_char_blockr1 "|" "⎫" # ⎞⎤⎫
-set -g __prompt_char_blockr2 "|" "⎭" # ⎠⎦⎭
-set -g __prompt_char_arrow ">" "≻"
-set -g __prompt_char_shell "fish" "♓"
-
-touch /home/pconley/temp/fish-reload
+touch $__prompt_reload_file
 
 function prompt_block --description 'Two-line prompt with time, host, SHLVL, shell, status, cwd, and vcs info'
    set -l last_status $argv[1]
@@ -24,36 +8,23 @@ function prompt_block --description 'Two-line prompt with time, host, SHLVL, she
       set -g __prompt_block_host (__prompt_set_block_host)
    end
 
-   __prompt_check_cwd
-
    echo
-   
-   # upper level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl1[$__prompt_utf8] "
-   echo -n "$__prompt_colour_date"(date "+%d %b at %H:%M")"$__prompt_colour_normal"
-   echo -n "$__prompt_colour_block $__prompt_char_blockr1[$__prompt_utf8] "
 
-   # display the CWD
-   echo -n "$__prompt_cwd"
+   echo -n -s \
+      (__prompt_block l1) " " \
+      (__prompt_date) \
+      (__prompt_block r1) " " \
+      (__prompt_dir_stack) (__prompt_cwd) " " (__prompt_vcs)
 
    echo
 
-   # lower level
-   echo -n "$__prompt_colour_block$__prompt_char_blockl3[$__prompt_utf8] "
-   echo -n $__prompt_block_host
-   echo -n "$__prompt_colour_block $__prompt_char_blockr2[$__prompt_utf8]"
-
-   # print status
-   if not test $last_status -eq 0
-      echo -n "$__prompt_colour_normal ($__prompt_colour_status$last_status$__prompt_colour_normal)"
-   end
-
-   if test -e "/home/pconley/temp/fish-reload"
-      echo -n "$__prompt_colour_status $__prompt_char_arrow[$__prompt_utf8] $__prompt_colour_normal"
-      rm "/home/pconley/temp/fish-reload"
-else
-      echo -n "$__prompt_colour_normal $__prompt_char_arrow[$__prompt_utf8] $__prompt_colour_normal"
-   end
+   echo -n \
+      (__prompt_block l3) \
+      $__prompt_block_host \
+      (__prompt_block r3) \
+      (__prompt_status $last_status) \
+      (__prompt_arrow) \
+      ""
 
 end
 
@@ -66,38 +37,25 @@ function __prompt_set_block_host --description "Set the host area of the prompt"
    #   have an event trigger to correct itself to the actual length
    set -l len_date 15
 
-   # set & draw the shell depth
-   set -l p_shlvl $__prompt_colour_normal
+   # Get the length - in visible characters - of symbols in the block
+   # Can't use the result of __prompt_host, etc., as colours are several bytes
+   # long
    set -l len_shlvl 0
-   if test $SHLVL -gt 1
-      set p_shlvl "$__prompt_colour_shlvl$SHLVL$__prompt_colour_normal""x"
-      set len_shlvl 2
+   if test -z $TMUX -a $SHLVL -gt 1 -o $SHLVL -gt 2
+      set len_shlvl (echo -n $__prompt_char_shlvl | wc -m)
    end
-   echo -n $p_shlvl
 
-   # set & draw the hostname
-   set -l p_host (hostname -s)
-   set -l len_host (echo $p_host | wc -c)
-   echo -n "$__prompt_colour_host$p_host"
+   set -l len_host (hostname -s | wc -c)
+   set -l len_shell (echo -n $__prompt_char_shell[$__prompt_use_utf8] | wc -m)
 
-   set -l len_upper (math $len_date-$len_shlvl-$len_host)
+   set -l len_diff (math "$len_date-$len_shlvl-$len_host-$len_shell")
 
-   for i in (seq $len_upper )
+   echo -n -s (__prompt_shlvl) (__prompt_host)
+   for i in (seq $len_diff)
       echo -n " "
    end
+   echo -n (__prompt_shell)
 
-   # TODO: use 'fish' as the ASCII shell ID. Account for that in the length
-   echo -n "$__prompt_colour_normal$__prompt_char_shell[$__prompt_utf8]"
-end
-
-function prompt_unicode_disable
-   set -g __prompt_utf8 1
-   __prompt_reset
-end
-
-function prompt_unicode_enable
-   set -g __prompt_utf8 2
-   __prompt_reset
 end
 
 function __prompt_reset --description "Reset all parts of the prompt"
