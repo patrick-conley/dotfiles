@@ -39,23 +39,51 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
 
    if not set -q __prompt_saved_vcs_type
 
-      # TODO: truncate the directory names if the prompt is long
+      set local_pwd (echo $PWD | sed "s/^$escaped_home/~/")
+
+      # Truncate the directory names if they're too long
+      if test (echo $local_pwd | wc -c) -gt 60
+         set -l nDirs (echo -n $local_pwd | grep -o "/" | wc -l)
+         set -l max (math "60 / ($nDirs + 1)")
+
+         if test $max -lt 4
+            set local_pwd (echo $local_pwd | sed -e "s-\([^/]\{1,4\}\)[^/]*/-\1/-g")
+         else
+            set local_pwd (echo $local_pwd | sed -e "s-\([^/]\{1,$max\}\)[^/]*/-\1/-g")
+         end
+      end
+
       set -g __prompt_saved_cwd \
          $__prompt_colour_block $__prompt_char_pwd_l \
-         $__prompt_colour_pwd (echo $PWD | sed "s/^$escaped_home/~/") \
+         $__prompt_colour_pwd $local_pwd \
          $__prompt_colour_block $__prompt_char_pwd_r \
          $__prompt_colour_normal
 
    else
 
-      # The lengthy var substitution below changes "/home/me" to "~", then
-      # truncates each directory above the repo root to its first few
-      # characters
-
-      set -l head (echo $vcs_root[1] | \
-            sed -e "s/^$escaped_home/~/" -e  's/[^/]*$//' -e "s-\([^/]\{1,4\}\)[^/]*/-\1/-g")
+      # Remove unwanted characters (extra "/", /home/username, etc.)
+      # Always truncate directory names outside the repository.
+      # If the CWD is too long, remove the outside directories entirely, and
+      # truncate directory names within the repository as needed.
+      set -l head (echo $vcs_root[1] | sed -e "s/^$escaped_home/~/" -e  's/[^/]*$//' -e "s-\([^/]\{1,4\}\)[^/]*/-\1/-g")
       set -l root (echo $vcs_root[1] | sed 's-.*/--')
       set -l prefix (echo $vcs_root[2] | sed -e 's-^\([^/]\)-/\1-' -e 's-/$--')
+
+      if test -n $prefix -a (echo "$head$root$prefix" | wc -c) -gt 60
+         set head ""
+
+         if test (echo -n "$root$prefix" | wc -c) -gt 60
+            set -l nDirs (echo -n $prefix | grep -o "/" | wc -l)
+            set -l rootLen (echo -n $root | wc -c)
+            set -l max (math "(60 - $rootLen) / $nDirs")
+
+            if test $max -lt 4
+               set prefix (echo $prefix | sed -e "s-\([^/]\{1,4\}\)[^/]*/-\1/-g")
+            else
+               set prefix (echo $prefix | sed -e "s-\([^/]\{1,$max\}\)[^/]*/-\1/-g")
+            end
+         end
+      end
 
       set -g __prompt_saved_cwd \
          $__prompt_colour_block $__prompt_char_pwd_l \
