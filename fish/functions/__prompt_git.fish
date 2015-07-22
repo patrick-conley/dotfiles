@@ -25,7 +25,7 @@ function __prompt_git --description 'Check git statuses'
 
    # Update tags
    if command test $vcs_paths[1]/tags -ot /tmp/fish_prompt_time
-      ctags --tag-relative --recurse --exclude=$vcs_paths[1] -f $vcs_paths[1]/tags $vcs_paths[2] &
+      ctags --tag-relative --recurse --exclude=$vcs_paths[1] -f $vcs_paths[1]/tags $vcs_paths[2] > /dev/null &
    end
 
 end
