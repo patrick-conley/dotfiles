@@ -1,17 +1,17 @@
 function svn
 
-   function less
-      /usr/bin/env less -XF $argv
+   function l_less
+      /usr/bin/env less -XF
    end
 
-   function svn_builtin
+   function l_svn
       /usr/bin/env svn $argv
    end
 
    if contains "diff" $argv \
       and not contains "--diff-cmd" $argv
 
-      svn_builtin $argv | less
+      l_svn $argv | l_less
       return
 
    else if contains "status" $argv \
@@ -21,19 +21,19 @@ function svn
 
       # Exclude status flags that are always printed for external directories,
       # but include info on modified files
-      svn_builtin $argv | grep -v -e "^\s*X" -e "^Performing status" -e '^\s*$' | less
+      l_svn $argv | grep -v -e "^\s*X" -e "^Performing status" -e '^\s*$' | l_less
       return
 
    else
       for i in "status" "log" "blame" "help" "praise" "propget"
          if contains $i $argv
 
-            svn_builtin $argv | less
+            l_svn $argv | l_less
             return
 
          end
       end
    end
 
-   svn_builtin $argv
+   l_svn $argv
 end

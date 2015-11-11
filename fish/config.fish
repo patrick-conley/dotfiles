@@ -6,5 +6,8 @@ if status --is-interactive
 end
 
 if status --is-login
-   set PATH $HOME/bin $HOME/bin/scripts $PATH
+   set PATH \
+      $HOME/bin/link \
+      $HOME/bin/scripts \
+      $PATH
 end
