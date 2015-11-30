@@ -6,7 +6,7 @@ touch $__prompt_reload_file
 function __prompt_git --description 'Check git statuses'
 
    # TODO: check submodules periodically (print <-)
-   set -l vcs_status (git status --short --branch --ignore-submodules ^/dev/null); or return
+   set -l vcs_status (git status --short --branch --ignore-submodules --untracked-files=no ^/dev/null); or return
    set -l vcs_paths (git rev-parse --git-dir --show-toplevel)
 
    if not test "$__prompt_saved_vcs_status" = "$vcs_status"
@@ -16,6 +16,7 @@ function __prompt_git --description 'Check git statuses'
 
    echo -n -s $__prompt_saved_vcs_info
 
+   # TODO: keep this time in .git
    touch --date="$__prompt_vcs_update_interval minutes ago" /tmp/fish_prompt_time
 
    # Update the remote refs
