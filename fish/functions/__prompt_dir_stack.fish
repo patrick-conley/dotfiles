@@ -17,8 +17,10 @@ function __prompt_set_dir_stack --on-variable PWD --description 'Update director
 
    # NB: popd temporarily leaves a copy of the original directory on the stack.
    # Dunno why.
-   if test (count $stack) -gt 2 -a $stack[1] != $stack[2]
-      set -g __prompt_saved_dirstack $__prompt_char_pushd[$__prompt_use_utf8]
+   if test (count $stack) -gt 2 
+      if test $stack[1] != $stack[2]
+         set -g __prompt_saved_dirstack $__prompt_char_pushd[$__prompt_use_utf8]
+      end
    else
       set -g __prompt_saved_dirstack ""
    end
