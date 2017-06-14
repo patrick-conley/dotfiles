@@ -72,7 +72,7 @@ function __prompt_git_redraw --description 'Draw the git branch'
          ## <branch-name> ...
          ## <branch-name>...origin/<branch-name> ...
          set git_prompt $git_prompt \
-            (echo -n $vcs_status[1] | sed -e 's/^## \(\S\+\)/\1/' -e 's/\.\.\..*//')
+            (echo -n $vcs_status[1] | sed -e 's/^## \([^\.]*\).*$/\1/')
    end
 
    if test $untracked -eq 1
