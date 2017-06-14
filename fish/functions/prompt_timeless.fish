@@ -26,7 +26,7 @@ function prompt_timeless --description 'Two-line prompt with host, SHLVL, shell,
       (__prompt_block l3) " " \
       (__prompt_status $last_status) \
       (__prompt_shell) " " \
-      (__prompt_arrow) " " \
+      (__prompt_arrow) " "
 
 end
 
