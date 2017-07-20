@@ -11,3 +11,6 @@ if status --is-login
       $HOME/bin/scripts \
       $PATH
 end
+
+# disable copy-on-delete
+set FISH_CLIPBOARD_CMD "cat" # https://github.com/fish-shell/fish-shell/issues/772
