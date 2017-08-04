@@ -37,6 +37,12 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
          set vcs_root[2] ""
       end
 
+   # svn
+   else if begin; which svn >/dev/null; and set vcs_root (svn info --show-item wc-root ^/dev/null); end
+      set -g __prompt_saved_vcs_type "svn"
+
+      set vcs_root[2] (pwd | sed -e "s#$vcs_root##")
+
    # not a repository
    else
       set -e __prompt_saved_vcs_type

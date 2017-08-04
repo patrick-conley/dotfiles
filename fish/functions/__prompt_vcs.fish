@@ -8,6 +8,9 @@ function __prompt_vcs --description 'Draw VCS branch name & status'
 
       case "hg"
          __prompt_hg
+
+      case "svn"
+         __prompt_svn
    end
 
 end

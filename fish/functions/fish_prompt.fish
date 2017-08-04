@@ -87,6 +87,7 @@ function __prompt_load_symbols --description 'Load mnemonic characters and colou
 
    set -g __prompt_char_git "git" "±"
    set -g __prompt_char_hg "hg" "☿"
+   set -g __prompt_char_svn "svn" "𝓢"
 
    # Time since origin has last been checked
    set -g __prompt_vcs_update_interval 15
