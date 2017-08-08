@@ -10,15 +10,22 @@ function __prompt_svn --description 'Print svn status'
       #set -g __prompt_saved_vcs_status $vcs_status
    #end
 
-   if test -z "$__prompt_saved_vcs_status"
-      __prompt_svn_redraw
+   set -l svn_branch (svn info --show-item relative-url)
+   if not test "$__prompt_saved_vcs_branch" = "$svn_branch"
+      __prompt_svn_redraw $svn_branch
+      set -g __prompt_saved_vcs_branch $svn_branch
    end
+
+   #if test -z "$__prompt_saved_vcs_status"
+      #__prompt_svn_redraw
+   #end
 
    echo -n -s $__prompt_saved_vcs_info
 end
 
 function __prompt_svn_redraw --description 'Regenerate svn status'
-   set vcs_status $argv
+   #set vcs_status $argv
+   set svn_branch $argv
 
    # Draw repo ID
    set -l svn_prompt $__prompt_char_svn[2] " "
@@ -48,7 +55,7 @@ function __prompt_svn_redraw --description 'Regenerate svn status'
    end
 
    # Draw the branch name
-   set svn_prompt $svn_prompt (svn info --show-item relative-url)
+   set svn_prompt $svn_prompt $svn_branch
 
    # draw the status
    if test $untracked -eq 1
