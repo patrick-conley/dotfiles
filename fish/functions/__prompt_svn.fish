@@ -10,7 +10,7 @@ function __prompt_svn --description 'Print svn status'
       #set -g __prompt_saved_vcs_status $vcs_status
    #end
 
-   set -l svn_branch (svn info --show-item relative-url)
+   set -l svn_branch (svn info --show-item relative-url (svn info --show-item wc-root))
    if not test "$__prompt_saved_vcs_branch" = "$svn_branch"
       __prompt_svn_redraw $svn_branch
       set -g __prompt_saved_vcs_branch $svn_branch
