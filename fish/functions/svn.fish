@@ -1,6 +1,6 @@
 function svn
 
-   function l_less
+	function l_less
       /usr/bin/env less -XF
    end
 
@@ -8,32 +8,80 @@ function svn
       /usr/bin/env svn $argv
    end
 
-   if contains "diff" $argv \
-      and not contains "--diff-cmd" $argv
+   if begin;
+         contains "diff" $argv[1]; \
+         and not contains -- "--diff-cmd" $argv;
+      end
 
       l_svn $argv | l_less
-      return
 
-   else if contains "status" $argv \
-      and not contains "-v" $argv \
-      and not contains "-q" $argv \
-      and not contains "--ignore-externals" $argv
+   else if contains "difftool" $argv[1]
+      set -e argv[1]
+      l_svn diff --diff-cmd svndiff.sh $argv
+
+   else if contains "diffs" $argv[1]
+      set -e argv[1]
+      l_svn diff --summarize $argv | l_less
+
+   else if contains "diffstat" $argv[1]
+      set -e argv[1]
+      l_svn diff --patch-compatible $argv | diffstat | l_less
+
+   else if begin; 
+         contains "status" $argv[1]; \
+         and not contains -- "-v" $argv; \
+         and not contains -- "-q" $argv; \
+         and not contains -- "--ignore-externals" $argv;
+      end
 
       # Exclude status flags that are always printed for external directories,
       # but include info on modified files
       l_svn $argv | grep -v -e "^\s*X" -e "^Performing status" -e '^\s*$' | l_less
-      return
 
-   else
-      for i in "status" "log" "blame" "help" "praise" "propget"
-         if contains $i $argv
+   else if contains "log" $argv[1]
+      set -e argv[1]
+      /usr/bin/svn log --incremental $argv | l_less
 
-            l_svn $argv | l_less
-            return
+   else if contains $argv[1] "blame" "help" "praise" "propget"
+      l_svn $argv | l_less
 
+   else if contains $argv[1] "switch"
+      set new_branch $argv[2]
+
+      # if a branch contains slashes, switch to it explicitly
+      if echo $new_branch | grep "/" >/dev/null
+         l_svn $argv
+         return
+      end
+
+      set current_path (l_svn info --show-item relative-url)
+      set current_branch (l_svn info --show-item relative-url (svn info --show-item wc-root))
+      if test $current_path != $current_branch
+         # Maybe fix this by cd'ing to the root, switching, then cd'ing back
+         echo "Can't autoswitch to non-root paths"
+         return
+      end
+
+      if echo $current_branch | grep branches >/dev/null
+         if test $new_branch = "trunk"
+            # branch to trunk
+            l_svn switch (echo $current_branch | sed 's!/branches/[^/]*$!!')/$new_branch
+         else
+            # branch to branch
+            l_svn switch (echo $current_branch | sed 's!/[^/]*$!!')/$new_branch
+         end
+      else
+         if test $new_branch = "trunk"
+            # trunk to trunk
+            l_svn $argv # nothing to do
+         else
+            # trunk to branch
+            l_svn switch (echo $current_branch | sed 's!trunk$!branches!')/$new_branch
          end
       end
-   end
 
-   l_svn $argv
+   else
+      l_svn $argv
+
+   end
 end
