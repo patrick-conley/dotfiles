@@ -45,7 +45,31 @@ function svn
    else if contains $argv[1] "blame" "help" "praise" "propget"
       l_svn $argv | l_less
 
-   else if contains $argv[1] "switch"
+   else if contains "branch" $argv[1]
+      set new_branch $argv[2]
+
+      set current_path (l_svn info --show-item relative-url)
+      set current_branch (l_svn info --show-item relative-url (svn info --show-item wc-root))
+      if test $current_path != $current_branch
+         # Maybe fix this by cd'ing to the root, switching, then cd'ing back
+         echo "Error: won't copy non-root paths"
+         return
+      end
+
+      if echo $current_branch | grep branches >/dev/null
+         set new_branch (echo $current_branch | sed 's!/[^/]*$!!')/$new_branch
+      else
+         set new_branch (echo $current_branch | sed 's!trunk$!branches!')/$new_branch
+      end
+
+      if l_svn ls $new_branch >/dev/null ^&1
+         echo "Error: Branch already exists"
+         return
+      end
+
+      l_svn copy $current_branch $new_branch
+
+   else if contains "switch" $argv[1]
       set new_branch $argv[2]
 
       # if a branch contains slashes, switch to it explicitly
@@ -58,7 +82,7 @@ function svn
       set current_branch (l_svn info --show-item relative-url (svn info --show-item wc-root))
       if test $current_path != $current_branch
          # Maybe fix this by cd'ing to the root, switching, then cd'ing back
-         echo "Can't autoswitch to non-root paths"
+         echo "Error Can't autoswitch to non-root paths"
          return
       end
 
@@ -70,14 +94,9 @@ function svn
             # branch to branch
             l_svn switch (echo $current_branch | sed 's!/[^/]*$!!')/$new_branch
          end
-      else
-         if test $new_branch = "trunk"
-            # trunk to trunk
-            l_svn $argv # nothing to do
-         else
-            # trunk to branch
-            l_svn switch (echo $current_branch | sed 's!trunk$!branches!')/$new_branch
-         end
+      else if test $new_branch != "trunk"
+         # trunk to branch
+         l_svn switch (echo $current_branch | sed 's!trunk$!branches!')/$new_branch
       end
 
    else
