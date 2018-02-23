@@ -68,6 +68,7 @@ function svn
       end
 
       l_svn copy $current_branch $new_branch
+      l_svn switch $new_branch
 
    else if contains "switch" $argv[1]
       set new_branch $argv[2]
