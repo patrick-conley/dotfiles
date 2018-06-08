@@ -7,9 +7,10 @@ function __prompt_git --description 'Check git statuses'
 
    # TODO: check submodules periodically (print <-)
    set -l vcs_status (git status --short --branch --ignore-submodules --untracked-files=no ^/dev/null); or return
-   set -l vcs_paths (git rev-parse --git-dir --show-toplevel)
+   set -l vcs_paths (git rev-parse --git-dir --show-toplevel --short HEAD)
 
    if not test "$__prompt_saved_vcs_status" = "$vcs_status"
+      set vcs_status[1] (echo $vcs_status[1] | sed -e "s/HEAD (no branch)/detatched at $vcs_paths[3]/")
       __prompt_git_redraw $vcs_status
       set -g __prompt_saved_vcs_status $vcs_status
    end
@@ -66,8 +67,6 @@ function __prompt_git_redraw --description 'Draw the git branch'
       case '## Initial commit on *'
          set git_prompt $git_prompt \
             (echo -n $vcs_status[1] | sed 's/^## Initial commit on \(.*\)$/\1/')
-      case '## HEAD (no branch)'
-         set git_prompt $git_prompt 'no branch'
       case '*'
          ## <branch-name> ...
          ## <branch-name>...origin/<branch-name> ...
