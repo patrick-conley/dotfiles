@@ -19,6 +19,8 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
    # escaped
    set -l escaped_home (echo $HOME | sed 's-/-\\\\/-g')
 
+   set -e __prompt_saved_vcs_branch
+
    # Check if we're in a VCS repository
    # git
    if begin; which git >/dev/null; and set vcs_root (git rev-parse --show-toplevel --show-prefix ^/dev/null); end
