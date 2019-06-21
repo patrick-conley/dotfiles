@@ -104,7 +104,8 @@ function __prompt_load_symbols --description 'Load mnemonic characters and colou
    set -g __prompt_char_block_r3 "|" "⎭" # ⎝⎣⎩ ⌡
    set -g __prompt_char_arrow ">" "≻"
    set -g __prompt_char_arrow_nowrite ">" "⊁"
-   set -g __prompt_char_shell "fish" "♒"
+   #set -g __prompt_char_shell "fish" "♒"# in my vm this messes up line length
+   set -g __prompt_char_shell "fish" "f"
    set -g __prompt_char_shlvl "+"
    set -g __prompt_char_linux " (linux)" "" # "" # Tux (fonts-linuxlibertine - installed with LaTeX)
    set -g __prompt_char_mac " (os x)" "⌘" # "⌘ "

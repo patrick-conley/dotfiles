@@ -1,6 +1,6 @@
 function svn
 
-	function l_less
+   function l_less
       /usr/bin/env less -XF
    end
 
@@ -17,7 +17,7 @@ function svn
 
    else if contains "difftool" $argv[1]
       set -e argv[1]
-      l_svn diff --diff-cmd svndiff.sh $argv
+      l_svn diff --diff-cmd ~/bin/svndiff.sh $argv
 
    else if contains "diffs" $argv[1]
       set -e argv[1]
@@ -27,7 +27,7 @@ function svn
       set -e argv[1]
       l_svn diff --patch-compatible $argv | diffstat | l_less
 
-   else if begin; 
+   else if begin;
          contains "status" $argv[1]; \
          and not contains -- "-v" $argv; \
          and not contains -- "-q" $argv; \
@@ -52,11 +52,12 @@ function svn
       set current_branch (l_svn info --show-item relative-url (svn info --show-item wc-root))
       if test $current_path != $current_branch
          # Maybe fix this by cd'ing to the root, switching, then cd'ing back
-         echo "Error: won't copy non-root paths"
+         echo "Error: Won't copy non-root paths"
          return
       end
 
       if echo $current_branch | grep branches >/dev/null
+         echo "Warning: Creating a branch off a branch"
          set new_branch (echo $current_branch | sed 's!/[^/]*$!!')/$new_branch
       else
          set new_branch (echo $current_branch | sed 's!trunk$!branches!')/$new_branch
@@ -83,7 +84,7 @@ function svn
       set current_branch (l_svn info --show-item relative-url (svn info --show-item wc-root))
       if test $current_path != $current_branch
          # Maybe fix this by cd'ing to the root, switching, then cd'ing back
-         echo "Error Can't autoswitch to non-root paths"
+         echo "Error: Can't autoswitch to non-root paths"
          return
       end
 
@@ -99,6 +100,29 @@ function svn
          # trunk to branch
          l_svn switch (echo $current_branch | sed 's!trunk$!branches!')/$new_branch
       end
+
+   else if contains "fixmove" $argv[1]
+      set src $argv[2]
+      set dest $argv[3]
+
+      # if the first arg exists and is not committed, then it's actually the
+      # destination
+      if begin;
+            test -e $argv[2]; \
+            and not svn status $argv[2];
+         end
+
+            set dest $argv[2]
+            set src $argv[3]
+      end
+
+      echo From $src
+      echo to $dest
+      echo
+
+      mv $dest $src
+      l_svn add --parents (dirname $dest)
+      l_svn mv $src $dest
 
    else
       l_svn $argv

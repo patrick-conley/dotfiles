@@ -48,6 +48,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
    # not a repository
    else
       set -e __prompt_saved_vcs_type
+      set -e __prompt_saved_vcs_status
    end
 
    # FIXME: this step is 15% of the function's running time
