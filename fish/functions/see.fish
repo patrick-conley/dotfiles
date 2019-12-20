@@ -4,7 +4,9 @@ function see
       set argv[1] "."
    end
 
-   if test -f $argv[1]
+   if file $argv[1] | grep "Zip archive data" > /dev/null
+     unzip -l $argv
+   else if test -f $argv[1]
       less $argv
    else
       ls $argv[1]
