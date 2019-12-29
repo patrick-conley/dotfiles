@@ -7,7 +7,6 @@ end
 
 if status --is-login
    set PATH \
-      $HOME/bin/link \
       $HOME/bin/scripts \
       $PATH
 end
