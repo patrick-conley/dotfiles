@@ -17,9 +17,9 @@ function __prompt_hg --description 'Check mercurial statuses'
 
    echo -n -s $__prompt_saved_vcs_info
 
-   touch --date="$__prompt_vcs_update_interval minutes ago" /tmp/fish_prompt_time
+   touch --date="$__prompt_vcs_update_interval minutes ago" $vcs_paths/.hg/fish_prompt_time
 
-   if command test $vcs_paths/.hg/tags -ot /tmp/fish_prompt_time
+   if command test $vcs_paths/.hg/tags -ot $vcs_paths/.hg/fish_prompt_time
       ctags --tag-relative --recurse --exclude=$vcs_paths/.hg -f $vcs_paths/.hg/tags $vcs_paths ^ /dev/null &
    end
 
