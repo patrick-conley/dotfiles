@@ -15,7 +15,7 @@ function __git_update \
    if command test \
          -f $vcs_paths[1]/FETCH_HEAD -a \
          $vcs_paths[1]/FETCH_HEAD -ot $vcs_paths[1]/fish_prompt_time
-      git remote update ^&1 >/dev/null
+      git remote update ^&1 >/dev/null &
    end
 
    # Update tags
