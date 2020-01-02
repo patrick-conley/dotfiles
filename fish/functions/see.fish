@@ -4,8 +4,8 @@ function see
       set argv[1] "."
    end
 
-   if file $argv[1] | grep "Zip archive data" > /dev/null
-     unzip -l $argv
+   if file $argv[1] | grep "\(Zip\|Java\) archive data" > /dev/null
+     unzip -l $argv | less
    else if test -f $argv[1]
       less $argv
    else
