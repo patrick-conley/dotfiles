@@ -15,14 +15,14 @@ function __git_update \
    if command test \
          -f $vcs_paths[1]/FETCH_HEAD -a \
          $vcs_paths[1]/FETCH_HEAD -ot $vcs_paths[1]/fish_prompt_time
-      git remote update ^&1 >/dev/null &
+      git remote update ^&1 >/dev/null
    end
 
    # Update tags
    if command test $vcs_paths[1]/tags -ot $vcs_paths[1]/fish_prompt_time
       ctags --tag-relative --recurse --exclude=$vcs_paths[1] \
          -f $vcs_paths[1]/tags \
-         $vcs_paths[2] ^ /dev/null &
+         $vcs_paths[2] ^&1 >/dev/null &
    end
 
 end
