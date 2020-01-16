@@ -19,10 +19,11 @@ function __git_update \
    end
 
    # Update tags
-   if command test $vcs_paths[1]/tags -ot $vcs_paths[1]/fish_prompt_time
-      ctags --tag-relative --recurse --exclude=$vcs_paths[1] \
-         -f $vcs_paths[1]/tags \
-         $vcs_paths[2] ^&1 >/dev/null &
-   end
+   # FIXME this apparently never terminates... and I don't use ctags much
+   #if command test $vcs_paths[1]/tags -ot $vcs_paths[1]/fish_prompt_time
+      #ctags --tag-relative --recurse --exclude=$vcs_paths[1] \
+         #-f $vcs_paths[1]/tags \
+         #$vcs_paths[2] ^&1 >/dev/null &
+   #end
 
 end

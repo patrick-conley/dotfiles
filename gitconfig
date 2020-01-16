@@ -1,9 +1,9 @@
 [push]
-	default = simple
+  default = simple
 [diff]
-	tool = vimdiff
+  tool = vimdiff
 [difftool]
-	prompt = false
+  prompt = false
 [difftool "vimdiff"]
    cmd = vim -f -d -c 'wincmd l' -c 'cd $GIT_PREFIX' $LOCAL $REMOTE
 [merge]
@@ -12,12 +12,13 @@
 [mergetool]
    prompt = false
 [core]
-	excludesfile = /home/pconley/.gitignore
+  excludesfile = /home/pconley/.gitignore
 [alias]
-	qlog = log --date=format:'%y-%m-%d %H:%M' --pretty=format:'%Cgreen(%cd) %C(yellow)%h%Creset %d%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit
-   prune-merged = "!git fetch -p; git branch --merged master | grep -vF 'master' | xargs git branch -d"
-   push-new = !bash -c 'git push -u origin $(git rev-parse --abbrev-ref HEAD)'
-   amend = commit --amend
-   jedi = push -f
+  qlog = log --date=format:'%y-%m-%d %H:%M' --pretty=format:'%Cgreen(%cd) %C(yellow)%h%Creset %d%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit
+  prune-merged = "!git fetch -p; git branch --merged master | grep -vF 'master' | xargs git branch -d"
+  push-new = !bash -c 'git push -u origin $(git rev-parse --abbrev-ref HEAD)'
+  amend = commit --amend
+  jedi = push -f
+  url-checkout = "!f() { git checkout -b ${1-feature}/$(echo \"$2\" | grep -o \"[A-Z]\\+-[0-9]\\+\"); }; f"
 [init]
-	templatedir = /home/pconley/.git-templates
+  templatedir = /home/pconley/.git-templates
