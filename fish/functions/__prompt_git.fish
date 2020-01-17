@@ -30,23 +30,31 @@ function __prompt_git_redraw --description 'Draw the git branch'
    # Check the status
    set -l local_status (__git_local_status $vcs_status)
 
-   if echo $local_status | grep "unmerged\|dirty" >/dev/null
-      set git_prompt $git_prompt $__prompt_colour_vcs_dirty
-   else
-      set git_prompt $git_prompt $__prompt_colour_vcs_clean
-   end
-
    # Draw the branch name
    # time: 1.3s to echo; 1.7s to set
    switch $vcs_status[1]
       case '## Initial commit on *'
-         set git_prompt $git_prompt \
+         set git_prompt $git_prompt $__prompt_colour_vcs_dirty \
             (echo -n $vcs_status[1] | sed 's/^## Initial commit on \(.*\)$/\1/')
       case '*'
+
          ## <branch-name> ...
          ## <branch-name>...origin/<branch-name> ...
-         set git_prompt $git_prompt \
+         set -l branch_name \
             (echo -n $vcs_status[1] | sed -e 's/^## \([^\.]*\).*$/\1/')
+
+         if begin;
+               test $branch_name = master
+               and echo $local_status | grep "unmerged\|dirty" >/dev/null
+            end
+            set git_prompt $git_prompt $__prompt_colour_vcs_dirty_master
+         else if echo $local_status | grep "unmerged\|dirty" >/dev/null
+            set git_prompt $git_prompt $__prompt_colour_vcs_dirty
+         else
+            set git_prompt $git_prompt $__prompt_colour_vcs_clean
+         end
+
+         set git_prompt $git_prompt $branch_name
    end
 
    if echo $local_status | grep "untracked" >/dev/null
