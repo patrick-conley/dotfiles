@@ -1,0 +1,113 @@
+#!/bin/bash
+
+#
+# Summary: Filters for git diff
+
+function help {
+   cat <<EOHD
+
+Filters for git diff
+
+Usage:
+   git filter <command> <filter> <treeish>
+
+Filters:
+
+   add
+      Show files with only added lines.
+   rm|delete
+      Show files with only deleted lines.
+   mod|modified
+      Show files with both added and deleted lines
+   sim|similar|format
+      Show files with about the same number of additions and removed lines.
+      These are probably files in which most changes were caused by
+      reformatting.
+
+Commands:
+
+   ls|list
+      List the filtered files
+   diff
+      Run git diff on the filtered files
+   difftool
+      Run git difftool on the filtered files
+EOHD
+}
+
+function add {
+   treeish=$1
+
+   git diff --numstat $treeish | awk '{
+      if ($2 == 0) {
+         print $3
+      }
+   }'
+}
+
+function rm {
+   delete $1
+}
+
+function delete {
+   treeish=$1
+
+   git diff -w --numstat $treeish | awk '{
+      if ($1 == 0) {
+         print $3
+      }
+   }'
+}
+
+function mod {
+   modified $1
+}
+
+function modified {
+   treeish=$1
+
+   git diff -w --numstat $treeish | awk '{
+      if ($1 != 0 && $2 != 0) {
+         print $3
+      }
+   }'
+}
+
+function sim {
+   format $1
+}
+
+function similar {
+   format $1
+}
+
+function format {
+   treeish=$1
+
+   git diff -w --numstat $treeish | awk '{
+      if ($1 != 0 && $2 != 0 && $1/$2 < 2 && $2/$1 < 2) {
+         print $3
+      }
+   }'
+}
+
+if [[ $1 == help ]]; then
+   help
+   exit
+fi
+
+if [[ $# -lt 3 ]]; then
+   help
+   exit 1
+fi
+
+if [[ $1 == ls || $1 == list ]]; then
+   $2 $3
+elif [[ $1 == diff ]]; then
+   git diff $3 $($2 $3)
+elif [[ $1 == difftool ]]; then
+   git difftool $3 $($2 $3)
+else
+   help
+   exit 2
+fi
