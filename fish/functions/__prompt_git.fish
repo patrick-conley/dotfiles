@@ -17,7 +17,7 @@ function __prompt_git --description 'Check git statuses'
 
    echo -n -s $__prompt_saved_vcs_info
 
-   __git_update $vcs_paths &
+   __git_update $vcs_paths >/dev/null &
 
 end
 
