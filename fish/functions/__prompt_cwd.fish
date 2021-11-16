@@ -20,6 +20,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
    set -l escaped_home (echo $HOME | sed 's-/-\\\\/-g')
 
    set -e __prompt_saved_vcs_branch
+   set -e __prompt_saved_vcs_status
 
    # Check if we're in a VCS repository
    # git
@@ -48,7 +49,6 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
    # not a repository
    else
       set -e __prompt_saved_vcs_type
-      set -e __prompt_saved_vcs_status
    end
 
    # FIXME: this step is 15% of the function's running time

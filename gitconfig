@@ -19,7 +19,7 @@
   push-new = !bash -c 'git push -u origin $(git rev-parse --abbrev-ref HEAD)'
   amend = commit --amend
   jedi = push -f
-  churl = "!f() { git checkout -b ${1-feature}/$(echo \"$2\" | grep -o \"[A-Z]\\+-[0-9]\\+\"); }; f"
+  churl = "!f() { git checkout -b ${1-feature}/$(echo \"$2\" | grep -o \"[A-Z]\\+-[0-9]\\+.*\"); }; f"
   filter = "!f() { ~/.dotfiles/git/git-diff-filters $@; }; f"
 [init]
   templatedir = /home/pconley/.git-templates

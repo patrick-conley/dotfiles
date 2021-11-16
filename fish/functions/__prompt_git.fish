@@ -40,15 +40,22 @@ function __prompt_git_redraw --description 'Draw the git branch'
 
          ## <branch-name> ...
          ## <branch-name>...origin/<branch-name> ...
-         set -l branch_name \
-            (echo -n $vcs_status[1] | sed -e 's/^## \([^\.]*\).*$/\1/')
+         set -l branch_name
+         if echo $vcs_status[1] | grep -q "\.\.\."
+            set branch_name \
+               (echo -n $vcs_status[1] | sed -e 's/^## \(\S*\)\.\.\..*/\1/')
+         else
+            set branch_name \
+               (echo -n $vcs_status[1] | sed -e 's/^## \(\S*\).*/\1/')
+         end
+            #(echo -n $vcs_status[1] | sed -e 's/^## \([^\.]*\).*$/\1/')
 
          if begin;
                test $branch_name = master
-               and echo $local_status | grep "unmerged\|dirty" >/dev/null
+               and echo $local_status | grep -q "unmerged\|dirty"
             end
             set git_prompt $git_prompt $__prompt_colour_vcs_dirty_master
-         else if echo $local_status | grep "unmerged\|dirty" >/dev/null
+         else if echo $local_status | grep -q "unmerged\|dirty"
             set git_prompt $git_prompt $__prompt_colour_vcs_dirty
          else
             set git_prompt $git_prompt $__prompt_colour_vcs_clean
