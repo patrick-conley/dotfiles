@@ -6,7 +6,7 @@ touch $__prompt_reload_file
 function __prompt_git --description 'Check git statuses'
 
    # TODO: check submodules periodically (print <-)
-   set -l vcs_status (git status --short --branch --ignore-submodules --untracked-files=no ^/dev/null); or return
+   set -l vcs_status (git status --short --branch --ignore-submodules --untracked-files=no 2>/dev/null); or return
    set -l vcs_paths (git rev-parse --git-dir --show-toplevel --short HEAD)
 
    if not test "$__prompt_saved_vcs_status" = "$vcs_status"

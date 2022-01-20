@@ -24,7 +24,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
 
    # Check if we're in a VCS repository
    # git
-   if begin; which git >/dev/null; and set vcs_root (git rev-parse --show-toplevel --show-prefix ^/dev/null); end
+   if begin; command -q git; and set vcs_root (git rev-parse --show-toplevel --show-prefix 2>/dev/null); end
       set -g __prompt_saved_vcs_type "git"
 
       if test (count $vcs_root) -eq 1
@@ -32,7 +32,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       end
 
    # mercurial
-   else if begin; which hg >/dev/null; and set vcs_root (hg prompt "{root}\n{root|prefix}" ^/dev/null); end
+   else if begin; command -q hg; and set vcs_root (hg prompt "{root}\n{root|prefix}" 2>/dev/null); end
       set vcs_root (echo -e $vcs_root)
       set -g __prompt_saved_vcs_type "hg"
 
@@ -41,7 +41,7 @@ function __prompt_set_cwd --on-variable PWD --description 'Update the cwd when t
       end
 
    # svn
-   else if begin; which svn >/dev/null; and set vcs_root (svn info --show-item wc-root ^/dev/null); end
+   else if begin; command -q svn; and set vcs_root (svn info --show-item wc-root 2>/dev/null); end
       set -g __prompt_saved_vcs_type "svn"
 
       set vcs_root[2] (pwd | sed -e "s#$vcs_root##")

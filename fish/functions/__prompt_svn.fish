@@ -3,7 +3,7 @@ touch $__prompt_reload_file
 function __prompt_svn --description 'Print svn status'
 
    ## this is expensive
-   #set -l vcs_status (svn status -q ^/dev/null); or return
+   #set -l vcs_status (svn status -q 2>/dev/null); or return
 
    #if not test "$__prompt_saved_vcs_status" = "$vcs_status"
       #__prompt_svn_redraw $vcs_status
