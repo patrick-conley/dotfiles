@@ -11,7 +11,7 @@ if status --is-login
       $PATH
 end
 
-if command -q lesspipe
+if command -s lesspipe >/dev/null
    set -x LESSOPEN "| /usr/bin/lesspipe %s"
    set -x LESSCLOSE "/usr/bin/lesspipe %s %s"
 end
