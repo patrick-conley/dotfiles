@@ -52,9 +52,10 @@ function __prompt_git_redraw --description 'Draw the git branch'
 
          if begin;
                test $branch_name = master
+               or test $branch_name = main
                and echo $local_status | grep -q "unmerged\|dirty"
             end
-            set git_prompt $git_prompt $__prompt_colour_vcs_dirty_master
+            set git_prompt $git_prompt $__prompt_colour_vcs_dirty_main
          else if echo $local_status | grep -q "unmerged\|dirty"
             set git_prompt $git_prompt $__prompt_colour_vcs_dirty
          else

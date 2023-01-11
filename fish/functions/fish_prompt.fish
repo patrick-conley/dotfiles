@@ -63,7 +63,7 @@ function __prompt_load_symbols --description 'Load mnemonic characters and colou
    set -g __prompt_colour_vcs_path (set_color green)
    set -g __prompt_colour_vcs_prefix (set_color yellow)
    set -g __prompt_colour_vcs_clean (set_color green)
-   set -g __prompt_colour_vcs_dirty_master (set_color -o red)
+   set -g __prompt_colour_vcs_dirty_main (set_color -o red)
    set -g __prompt_colour_vcs_dirty (set_color red)
    set -g __prompt_colour_vcs_normal (set_color normal)
    set -g __prompt_colour_vcs_detatched (set_color red)
