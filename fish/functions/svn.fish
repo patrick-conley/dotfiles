@@ -63,7 +63,7 @@ function svn
          set new_branch (echo $current_branch | sed 's!trunk$!branches!')/$new_branch
       end
 
-      if l_svn ls $new_branch >/dev/null ^&1
+      if l_svn ls $new_branch >/dev/null 2>&1
          echo "Error: Branch already exists"
          return
       end
