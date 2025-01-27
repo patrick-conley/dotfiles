@@ -1,3 +1,6 @@
+# disable GREP_OPTIONS, which produces a warning
+set -x GREP_OPTIONS
+
 if status --is-interactive
    fish_prompt >/dev/null
    __prompt_cwd >/dev/null
@@ -7,7 +10,10 @@ end
 
 if status --is-login
    set PATH \
+      $HOME/bin \
+      $HOME/bin/java-scripts \
       $HOME/bin/scripts \
+      $HOME/.local/bin \
       $PATH
 end
 
